@@ -1,0 +1,85 @@
+@import url('https://cdn.jsdelivr.net/gh/sunn-us/SUIT/fonts/variable/woff2/SUIT-Variable.css');
+@import "tailwindcss";
+
+@theme {
+  /* Primary (보라 스케일) */
+  --color-primary-01: #20004D;
+  --color-primary-02: #2B0073;
+  --color-primary-03: #3A0090;
+  --color-primary-04: #4C00B2;
+  --color-primary-05: #5700CC;
+  --color-primary-06: #5E1AD2;
+  --color-primary-07: #6633CC;
+  --color-primary-08: #7445D6;
+  --color-primary-09: #8257E0;
+  --color-primary-10: #9169EB;
+  --color-primary-11: #A17CF0;
+  --color-primary-12: #B08FF4;
+  --color-primary-13: #C0A3F7;
+  --color-primary-14: #CEB7FA;
+  --color-primary-15: #DAC7FC;
+  --color-primary-16: #E3D4FD;
+  --color-primary-17: #ECE0FE;
+  --color-primary-18: #F0E9FF;
+  --color-primary-19: #F6F2FF;
+  --color-primary-20: #FDFAFF;
+
+  /* GrayScale */
+  --color-gray-100: #FDFAFF;
+  --color-gray-90: #F7F6F9;
+  --color-gray-80: #F0EFF3;
+  --color-gray-70: #DAD8DE;
+  --color-gray-60: #C1BEC6;
+  --color-gray-50: #9D9AA3;
+  --color-gray-40: #78757D;
+  --color-gray-30: #5F5C66;
+  --color-gray-20: #242227;
+  --color-gray-10: #000000;
+
+  /* Background / Button / Tag */
+  --color-bg-base: #F4F3F7;
+  --color-btn-light: #EBE0FF;
+  --color-tag-purple: #F0E8FF;
+  --color-tag-blue: #ECEFFF;
+  --color-tag-soft: #F6F1FF;
+
+  --font-suit: 'SUIT Variable', 'SUIT', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.category-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'SUIT Variable', 'SUIT', sans-serif;
+  font-weight: 400;
+  background-color: #EBEBEB;
+  color: #242227;
+  letter-spacing: -0.01em;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#root {
+  width: 390px;
+  height: 844px;
+  flex-shrink: 0;
+  background-color: #F4F3F7;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
