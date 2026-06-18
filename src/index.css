@@ -58,6 +58,18 @@
   display: none;
 }
 
+.miyubot-input::placeholder {
+  color: #9D9AA3;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  transition: opacity 0.2s ease;
+}
+
+.miyubot-input:focus::placeholder {
+  opacity: 0;
+}
+
 html, body {
   height: 100%;
 }

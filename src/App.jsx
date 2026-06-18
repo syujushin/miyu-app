@@ -4,6 +4,7 @@ import HomePage       from './pages/home/HomePage'
 import MyPage         from './pages/mypage/MyPage'
 import MiyubotPage    from './pages/miyubot/MiyubotPage'
 import ComingSoonPage from './pages/common/ComingSoonPage'
+import AiDemoPage     from './pages/ai-demo/AiDemoPage'
 
 export default function App() {
   return (
@@ -16,6 +17,8 @@ export default function App() {
           <Route path="liked"    element={<ComingSoonPage title="곧 만나요!" subtitle="좋아요 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
           <Route path="mypage"   element={<MyPage />} />
         </Route>
+        {/* AI 데모 — 별도 레이아웃 없이 독립 페이지 */}
+        <Route path="ai-demo" element={<AiDemoPage />} />
       </Routes>
     </BrowserRouter>
   )

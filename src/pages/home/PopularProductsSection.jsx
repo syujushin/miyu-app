@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react'
 import addIcon     from '../../assets/images/home/add.svg'
-import controlIcon from '../../assets/Icon/Product/control.svg'
+import controlIcon from '../../assets/Icon/control.svg'
 
 import img01 from '../../assets/images/product/product-dummy-01.png'
 import img02 from '../../assets/images/product/product-dummy-02.png'
 import img03 from '../../assets/images/product/product-dummy-03.png'
 import img04 from '../../assets/images/product/product-dummy-04.png'
-import img05 from '../../assets/images/product/product-dummy-05.png'
 
 /* 추후 실제 이미지로 교체 예정 */
 const PRODUCTS = [
@@ -37,18 +36,10 @@ const PRODUCTS = [
   {
     id: 4,
     img: img04,
-    name: '아누아',
-    detail: '피디알엔 캡슐 100 세럼 50ml 대용량 기획',
-    price: '18,900',
+    name: '에스네이처',
+    detail: '아쿠아 오아시스 토너 300ml',
+    price: '24,000',
     tags: ['Miyu Only'],
-  },
-  {
-    id: 5,
-    img: img05,
-    name: '비노트',
-    detail: '비타민C 브라이트닝 세럼',
-    price: '29,000',
-    tags: ['1+1'],
   },
 ]
 
@@ -162,7 +153,7 @@ export default function PopularProductsSection() {
           justifyContent: 'space-between',
           paddingLeft: 16,
           paddingRight: 16,
-          marginBottom: 10,
+          marginBottom: 12,
         }}
       >
         <p style={{ fontSize: 19, fontWeight: 600, color: '#242227', margin: 0 }}>

@@ -1,7 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
-import react       from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import OpenAI      from 'openai'
+import OpenAI from 'openai'
 
 const PRODUCT_LIST = `
 1. 아누아 피디알엔 캡슐 / 23,500원 / 스킨케어
@@ -52,55 +49,19 @@ ${PRODUCT_LIST}
 
 {"message":"답변 텍스트","recommended_products":[{"name":"제품명","price":"가격","reason":"추천 이유 한 문장"}],"show_options":false}`
 
-/** Vite dev-server 미들웨어 — API 키는 Node.js 서버 측에서만 사용 */
-function openAiApiPlugin(apiKey) {
-  return {
-    name: 'openai-api',
-    configureServer(server) {
-      server.middlewares.use('/api/chat', async (req, res) => {
-        if (req.method !== 'POST') {
-          res.statusCode = 405
-          res.end('Method Not Allowed')
-          return
-        }
-        let body = ''
-        req.on('data', chunk => { body += chunk })
-        req.on('end', async () => {
-          try {
-            const { messages } = JSON.parse(body)
-            if (!apiKey) throw new Error('.env 파일에 OPENAI_API_KEY가 설정되지 않았습니다.')
-
-            const client     = new OpenAI({ apiKey })
-            const completion = await client.chat.completions.create({
-              model: 'gpt-4o-mini',
-              messages: [
-                { role: 'system', content: SYSTEM_PROMPT },
-                ...messages,
-              ],
-              max_tokens: 1024,
-              response_format: { type: 'json_object' },
-            })
-
-            res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify({ response: completion.choices[0].message.content }))
-          } catch (err) {
-            res.statusCode = 500
-            res.setHeader('Content-Type', 'application/json')
-            res.end(JSON.stringify({ error: err.message }))
-          }
-        })
-      })
-    },
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' })
+  try {
+    const { messages } = req.body
+    const client     = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    const completion = await client.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      max_tokens: 1024,
+      response_format: { type: 'json_object' },
+    })
+    res.status(200).json({ response: completion.choices[0].message.content })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
   }
 }
-
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
-  return {
-    plugins: [
-      react(),
-      tailwindcss(),
-      openAiApiPlugin(env.OPENAI_API_KEY),
-    ],
-  }
-})

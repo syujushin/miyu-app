@@ -10,14 +10,15 @@ export default function WeatherBanner({ onClose }) {
         padding: '4px 8px 4px 16px',
         height: 38,
         flexShrink: 0,
-        background: 'rgba(255, 255, 255, 0.25)',
-        backdropFilter: 'blur(2px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        border: '0.5px solid rgba(255, 255, 255, 0.28)',
+        /* 피부점수 카드 글래스와 동일한 효과 */
+        background: 'rgba(206, 183, 250, 0.10)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        border: '0.5px solid rgba(255, 255, 255, 0.35)',
         boxShadow: [
-          'inset 0 1px 0 rgba(255, 255, 255, 0.35)',
-          'inset 1px 0 0 rgba(255, 255, 255, 0.10)',
-          '0 1px 6px rgba(36, 34, 39, 0.04)',
+          'inset 0 1px 0 rgba(255, 255, 255, 0.60)',
+          'inset 1px 0 0 rgba(255, 255, 255, 0.20)',
+          '0 2px 10px rgba(102, 51, 204, 0.08)',
         ].join(', '),
       }}
     >

@@ -1,51 +1,592 @@
-export default function MiyubotPage() {
-  return (
-    <div className="flex flex-col h-full px-4 pt-6">
-      <h1 className="text-2xl font-semibold" style={{ color: '#242227' }}>Miyubot</h1>
-      <p className="text-sm mt-1" style={{ color: '#78757D' }}>AI 뷰티 어시스턴트</p>
+import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 
-      <div className="flex-1 mt-6 space-y-3">
-        <div className="flex gap-2">
-          <div
-            className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-semibold"
-            style={{ background: 'linear-gradient(135deg, #7733FF, #BB99FF)' }}
-          >
-            M
+import statusBarSvg  from '../../assets/Top/Status Bar.svg'
+import logoSvg       from '../../assets/logo/Top/Logo.svg'
+import logoIcon      from '../../assets/logo/logo-icon-square.svg'
+import homeIcon      from '../../assets/Icon/home-inactive.svg'
+import menuIcon      from '../../assets/Icon/ui/icon-menu.svg'
+import newChatIcon   from '../../assets/Icon/ui/Top/icon-newchat.svg'
+import cameraIcon    from '../../assets/miyubot/Bottom/miyubot-camera.svg'
+import sendIcon      from '../../assets/miyubot/Bottom/miyubot-send.svg'
+import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
+import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
+
+/* ── 데이터 ── */
+const SKIN_CHIPS     = ['복합성 피부', '건조함', '모공']
+const PERSONAL_CHIPS = ['봄웜라이트', '살몬코랄', '로즈베이지']
+const SUGGESTION_CHIPS = [
+  '무화과 메이크업에 어울리는 블러셔를 찾고 있어',
+  '봄웜 라이트 전용 신상 추천해줘',
+  '코랄빛이 살짝 도는 로즈베이지색의 틴트 제품 추천해줘',
+]
+import img11 from '../../assets/images/product/product-dummy-11.png'
+import img12 from '../../assets/images/product/product-dummy-12.png'
+import img13 from '../../assets/images/product/product-dummy-13.png'
+
+import { findProductByName } from '../../data/products'
+
+const BLUSHER_PRODUCTS = [
+  { id: 1, img: img11, name: 'VDL 치크스테인 블러셔',          price: '12,900', reason: '봄웜 피부에 딱 맞는 라이트 피치 발색으로 화사한 혈색을 연출해줘요' },
+  { id: 2, img: img12, name: '바닐라코 프라이밍 베일 치크 6g 5종', price: '12,000', reason: '피치 계열의 생기 있는 발색으로 건강하고 자연스러운 혈색 메이크업 완성' },
+  { id: 3, img: img13, name: '데이지크 블렌딩 무드 치크',          price: '24,000', reason: '피치·코랄 베이지 톤이 물들듯 스며들어 구르님 퍼스널 컬러에 잘 어울려요' },
+]
+const CATEGORIES = [
+  { label: '기초케어',  key: 'skincare' },
+  { label: '메이크업',  key: 'makeup' },
+  { label: '이너뷰티',  key: 'innerbeauty' },
+  { label: '디바이스',  key: 'device' },
+  { label: '피부진단',  key: 'diagnosis' },
+]
+
+/* ── 공통 스타일 ── */
+const skinChipStyle = {
+  fontSize: 12, fontWeight: 400, color: '#242227',
+  backgroundColor: '#F6F2FF', borderRadius: 8,
+  padding: '3px 8px', lineHeight: 1.5, whiteSpace: 'nowrap',
+}
+const botCardStyle = {
+  borderRadius: '0 20px 20px 20px',
+  backgroundColor: '#F7F6F9',
+  padding: 16,
+  marginBottom: 12,
+  width: '100%',
+  maxWidth: 320,
+}
+
+/* ── 사용자 말풍선 ── */
+function UserBubble({ text }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+      <div style={{
+        backgroundColor: '#6633CC',
+        borderRadius: '20px 0 20px 20px',
+        padding: '16px 16px',
+        maxWidth: '75%',
+        fontSize: 15, fontWeight: 400, color: '#FFFFFF',
+        lineHeight: 1.5, letterSpacing: '-0.01em', whiteSpace: 'pre-line',
+      }}>
+        {text}
+      </div>
+    </div>
+  )
+}
+
+/* ── 메이크업 봇 카드 (퍼스널 컬러) ── */
+function MakeupBotCard() {
+  return (
+    <div style={{ ...botCardStyle, marginBottom: 20 }}>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
+        구르님의 퍼스널을 기반으로 추천해드릴게요.
+      </p>
+      <p style={{ fontSize: 13, fontWeight: 500, color: '#78757D', margin: '0 0 8px', lineHeight: 1.4 }}>
+        퍼스널 진단 기록
+      </p>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+          <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, borderRadius: 6, display: 'block', flexShrink: 0 }} />
+          <p style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1.5 }}>
+            구르님의 퍼스널 컬러
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {PERSONAL_CHIPS.map(c => <span key={c} style={skinChipStyle}>{c}</span>)}
+        </div>
+      </div>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5 }}>
+        어떤 메이크업 제품을 추천 받고 싶으신가요?
+      </p>
+    </div>
+  )
+}
+
+/* ── 블러셔 봇 텍스트 카드 ── */
+function BlusherTextCard() {
+  return (
+    <div style={{ ...botCardStyle, marginBottom: 20 }}>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 14px', lineHeight: 1.6 }}>
+        구르님은 따뜻하고 화사한 21호 봄 웜톤이에요. 피부 톤에 자연스럽게 녹아드는 코랄과 피치 베이지 블러셔가 가장 잘 어울려요.
+      </p>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6 }}>
+        요청하신 무화과 메이크업처럼 은은하고 부드러운 룩에는 이런 컬러들이 얼굴에 따뜻한 생기를 더해주고, 전체 메이크업 톤을 한층 조화롭게 완성해 줄 거예요.
+      </p>
+    </div>
+  )
+}
+
+/* ── 블러셔 개별 제품 카드 — 300×205(hug), padding 12, radius 20 ── */
+function BlusherProductCard({ img, name, price, reason }) {
+  const [liked, setLiked] = useState(false)
+  return (
+    <div style={{
+      width: 300,
+      borderRadius: 20,
+      backgroundColor: '#F6F2FF',
+      padding: 16,
+      flexShrink: 0,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 12,
+      boxSizing: 'border-box',
+    }}>
+      {/* 흰색 제품 영역 — 276×69 */}
+      <div style={{
+        backgroundColor: '#FFFFFF',
+        borderRadius: 12,
+        padding: '12px 12px',
+        height: 69,
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        {/* 제품 이미지 44×44 */}
+        <img src={img} alt={name} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
+
+        {/* 제품명 + 가격 */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: '0 0 3px', lineHeight: 1.4, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+            {name}
+          </p>
+          <p style={{ margin: 0, lineHeight: 1 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#6633CC' }}>{price}</span>
+            <span style={{ fontSize: 11, fontWeight: 400, color: '#242227', marginLeft: 1 }}>원</span>
+          </p>
+        </div>
+
+        {/* 하트 */}
+        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, alignSelf: 'center', pointerEvents: 'auto' }}>
+          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
+        </button>
+      </div>
+
+      {/* 추천 이유 라벨 + 텍스트 (줄바꿈) */}
+      <div>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#6633CC', margin: '0 0 2px', lineHeight: 1.5 }}>
+          추천 이유
+        </p>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {reason}
+        </p>
+      </div>
+
+      {/* 구매하기 버튼 — 276×44 */}
+      <button style={{
+        width: '100%',
+        height: 44,
+        padding: 0,
+        borderRadius: 12,
+        backgroundColor: '#6633CC',
+        border: 'none',
+        cursor: 'pointer',
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: 500,
+        lineHeight: 1.5,
+        letterSpacing: '-0.01em',
+        pointerEvents: 'auto',
+        boxSizing: 'border-box',
+      }}>
+        구매하기
+      </button>
+    </div>
+  )
+}
+
+/* ── 블러셔 제품 가로 스크롤 ── */
+function BlusherProductScroll() {
+  const scrollRef  = useRef(null)
+  const isDragging = useRef(false)
+  const startX     = useRef(0)
+  const scrollLeft = useRef(0)
+
+  const onMouseDown = (e) => { isDragging.current = true; startX.current = e.pageX - scrollRef.current.offsetLeft; scrollLeft.current = scrollRef.current.scrollLeft }
+  const onMouseMove = (e) => { if (!isDragging.current) return; scrollRef.current.scrollLeft = scrollLeft.current - (e.pageX - scrollRef.current.offsetLeft - startX.current) }
+  const onMouseUp   = () => { isDragging.current = false }
+
+  return (
+    <div
+      ref={scrollRef}
+      className="category-scroll"
+      style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 20, cursor: 'grab', userSelect: 'none' }}
+      onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}
+    >
+      <div style={{ display: 'flex', gap: 8, width: 'max-content' }}>
+        {BLUSHER_PRODUCTS.map(p => <BlusherProductCard key={p.id} {...p} />)}
+      </div>
+    </div>
+  )
+}
+
+/* ── GPT 추천 제품 카드 ── */
+function GptProductCard({ name, price, reason }) {
+  const [liked, setLiked] = useState(false)
+  const found = findProductByName(name)
+  const imgSrc = found?.img ?? null
+
+  return (
+    <div style={{ width: 300, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
+      {/* 흰색 제품 영역 */}
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 12px', height: 69, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12 }}>
+        {imgSrc
+          ? <img src={imgSrc} alt={name} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
+          : <div style={{ width: 44, height: 44, borderRadius: 8, backgroundColor: '#F0EFF3', flexShrink: 0 }} />
+        }
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: '0 0 3px', lineHeight: 1.4, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{name}</p>
+          <p style={{ margin: 0, lineHeight: 1 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#6633CC' }}>{price}</span>
+            <span style={{ fontSize: 11, fontWeight: 400, color: '#242227', marginLeft: 1 }}>원</span>
+          </p>
+        </div>
+        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, alignSelf: 'center', pointerEvents: 'auto' }}>
+          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
+        </button>
+      </div>
+      {/* 추천 이유 */}
+      <div>
+        <p style={{ fontSize: 14, fontWeight: 700, color: '#6633CC', margin: '0 0 2px', lineHeight: 1.5 }}>추천 이유</p>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{reason}</p>
+      </div>
+      {/* 구매하기 */}
+      <button style={{ width: '100%', height: 44, padding: 0, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 14, fontWeight: 500, lineHeight: 1.5, letterSpacing: '-0.01em', pointerEvents: 'auto', boxSizing: 'border-box' }}>
+        구매하기
+      </button>
+    </div>
+  )
+}
+
+/* ── GPT 추천 제품 가로 스크롤 ── */
+function GptProductScroll({ products }) {
+  const scrollRef  = useRef(null)
+  const isDragging = useRef(false)
+  const startX     = useRef(0)
+  const scrollLeft = useRef(0)
+  const onMouseDown = (e) => { isDragging.current = true; startX.current = e.pageX - scrollRef.current.offsetLeft; scrollLeft.current = scrollRef.current.scrollLeft }
+  const onMouseMove = (e) => { if (!isDragging.current) return; scrollRef.current.scrollLeft = scrollLeft.current - (e.pageX - scrollRef.current.offsetLeft - startX.current) }
+  const onMouseUp   = () => { isDragging.current = false }
+  return (
+    <div ref={scrollRef} className="category-scroll" style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 12, cursor: 'grab', userSelect: 'none' }}
+      onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
+      <div style={{ display: 'flex', gap: 8, width: 'max-content' }}>
+        {products.map((p, i) => <GptProductCard key={i} {...p} />)}
+      </div>
+    </div>
+  )
+}
+
+/* ── 추천 질문 칩 (세로 스택) ── */
+function SuggestionChips({ items, onChipClick }) {
+  const CORAL_ITEM = '코랄빛이 살짝 도는 로즈베이지색의 틴트 제품 추천해줘'
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+      {items.map((item, i) => (
+        <button key={i}
+          onClick={() => onChipClick(item)}
+          style={{
+            padding: '12px 20px', borderRadius: 99,
+            backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer',
+            fontSize: 14, fontWeight: 500, color: '#6633CC',
+            textAlign: 'left', lineHeight: 1.5, letterSpacing: '-0.01em',
+          }}
+        >
+          {item === CORAL_ITEM
+            ? <>코랄빛이 살짝 도는 로즈베이지색의 틴트 제품<br />추천해줘</>
+            : item}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/* ── 메인 페이지 ── */
+export default function MiyubotPage() {
+  const navigate  = useNavigate()
+  const [messages,   setMessages]   = useState([])
+  const [inputValue, setInputValue] = useState('')
+  const [isTyping,   setIsTyping]   = useState(false)
+  const [gptHistory, setGptHistory] = useState([])  // GPT 대화 컨텍스트
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, isTyping])
+
+  const resetChat = () => {
+    setMessages([])
+    setGptHistory([])
+    setInputValue('')
+    setIsTyping(false)
+  }
+
+  const handleCategory = (key) => {
+    if (key === 'makeup') {
+      setMessages(prev => [
+        ...prev,
+        { type: 'user', text: '메이크업' },
+        { type: 'bot-makeup' },
+        { type: 'chips', items: SUGGESTION_CHIPS },
+      ])
+    } else if (key === 'diagnosis') {
+      console.log('피부진단 시나리오 시작') // TODO
+    } else {
+      console.log(`${key} 카테고리 선택됨`) // TODO
+    }
+  }
+
+  const handleSuggestion = (text) => {
+    if (text === '무화과 메이크업에 어울리는 블러셔를 찾고 있어') {
+      setMessages(prev => [
+        ...prev,
+        { type: 'user', text: '무화과 메이크업에 어울리는\n블러셔를 찾고 있어' },
+        { type: 'bot-blusher-text' },
+        { type: 'bot-blusher-products' },
+      ])
+    } else {
+      console.log('suggestion:', text) // TODO: 다음 단계 대화 연결 예정
+    }
+  }
+
+  /* 입력창 직접 타이핑 → GPT API 호출 */
+  const handleSend = async () => {
+    const text = inputValue.trim()
+    if (!text || isTyping) return
+
+    setInputValue('')
+    const userMsg = { role: 'user', content: text }
+    const nextHistory = [...gptHistory, userMsg]
+    setGptHistory(nextHistory)
+    setMessages(prev => [...prev, { type: 'user', text }])
+    setIsTyping(true)
+
+    try {
+      const res  = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextHistory }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+
+      const raw = data.response
+      setGptHistory(prev => [...prev, { role: 'assistant', content: raw }])
+
+      // JSON 파싱 → message + recommended_products 분리
+      const strip = (t) => (t ?? '').replace(/\*\*/g, '').trim()
+
+      let msgText     = strip(raw)
+      let products    = []
+      let showOptions = false
+      try {
+        const parsed = JSON.parse(raw)
+        msgText     = strip(parsed.message ?? raw)
+        products    = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
+        showOptions = parsed.show_options === true
+      } catch {
+        const match = raw.match(/\{[\s\S]*\}/)
+        if (match) {
+          try {
+            const parsed = JSON.parse(match[0])
+            msgText     = strip(parsed.message ?? raw)
+            products    = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
+            showOptions = parsed.show_options === true
+          } catch { /* 파싱 실패 시 원문 그대로 */ }
+        }
+      }
+      setMessages(prev => [...prev, { type: 'bot-gpt', text: msgText, products, showOptions }])
+    } catch {
+      setMessages(prev => [...prev, { type: 'bot-error' }])
+    } finally {
+      setIsTyping(false)
+    }
+  }
+
+  const renderMessage = (msg, idx) => {
+    switch (msg.type) {
+      case 'user':               return <UserBubble key={idx} text={msg.text} />
+      case 'bot-makeup':         return <MakeupBotCard key={idx} />
+      case 'chips':              return <SuggestionChips key={idx} items={msg.items} onChipClick={handleSuggestion} />
+      case 'bot-blusher-text':   return <BlusherTextCard key={idx} />
+      case 'bot-blusher-products': return <BlusherProductScroll key={idx} />
+      case 'bot-gpt':
+        return (
+          <div key={idx} style={{ marginBottom: 20 }}>
+            <div style={{ ...botCardStyle, marginBottom: msg.products?.length ? 8 : 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                {msg.text}
+              </p>
+            </div>
+            {msg.products?.length > 0 && <GptProductScroll products={msg.products} />}
+            {msg.showOptions && !msg.products?.length && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 12 }}>
+                {['제품 추천', '루틴 추천'].map(label => (
+                  <button
+                    key={label}
+                    onClick={() => {
+                      setInputValue(label)
+                      setTimeout(() => {
+                        setInputValue('')
+                        setMessages(prev => [...prev, { type: 'user', text: label }])
+                        const next = [...gptHistory, { role: 'user', content: label }]
+                        setGptHistory(next)
+                        setIsTyping(true)
+                        fetch('/api/chat', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ messages: next }),
+                        })
+                          .then(r => r.json())
+                          .then(data => {
+                            const raw2 = data.response
+                            setGptHistory(p => [...p, { role: 'assistant', content: raw2 }])
+                            const strip2 = (t) => (t ?? '').replace(/\*\*/g, '').trim()
+                            let t2 = strip2(raw2), p2 = [], s2 = false
+                            try { const j = JSON.parse(raw2); t2 = strip2(j.message ?? raw2); p2 = j.recommended_products ?? []; s2 = j.show_options === true } catch {}
+                            setMessages(p => [...p, { type: 'bot-gpt', text: t2, products: p2, showOptions: s2 }])
+                          })
+                          .catch(() => setMessages(p => [...p, { type: 'bot-error' }]))
+                          .finally(() => setIsTyping(false))
+                      }, 0)
+                    }}
+                    style={{
+                      padding: '12px 20px',
+                      borderRadius: 99,
+                      backgroundColor: '#F6F2FF',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      color: '#6633CC',
+                      lineHeight: 1.5,
+                      letterSpacing: '-0.01em',
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div
-            className="rounded-2xl rounded-tl-sm px-4 py-3 max-w-[75%]"
-            style={{ background: '#F6F2FF' }}
-          >
-            <p className="text-sm" style={{ color: '#242227' }}>
-              안녕하세요! 저는 Miyubot이에요 💜<br />
-              오늘 피부 고민이 있으신가요?
+        )
+      case 'bot-error':
+        return (
+          <div key={idx} style={{ ...botCardStyle, marginBottom: 20 }}>
+            <p style={{ fontSize: 15, fontWeight: 400, color: '#9D9AA3', margin: 0, lineHeight: 1.5 }}>
+              죄송해요, 지금은 답변을 드리기 어려워요. 잠시 후 다시 시도해주세요.
             </p>
+          </div>
+        )
+      default:                   return null
+    }
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', backgroundColor: '#FFFFFF' }}>
+
+      {/* ── 헤더 ── */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#FFFFFF' }}>
+        <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
+        <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 20, paddingRight: 16 }}>
+          <img src={logoSvg} alt="miyu" style={{ width: 84, height: 29, display: 'block' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* 새 대화 초기화 버튼 */}
+            <button onClick={resetChat} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+              <img src={newChatIcon} alt="새 대화" style={{ width: 28, height: 28, display: 'block' }} />
+            </button>
+            <button onClick={() => navigate('/')} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+              <img src={homeIcon} alt="홈" style={{ width: 28, height: 28, display: 'block' }} />
+            </button>
+            <button style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+              <img src={menuIcon} alt="메뉴" style={{ width: 28, height: 28, display: 'block' }} />
+            </button>
           </div>
         </div>
       </div>
 
-      <div
-        className="mt-4 mb-2 rounded-2xl px-4 py-3 flex items-center gap-2"
-        style={{
-          background: 'rgba(253, 250, 255, 0.9)',
-          border: '1px solid #DAD8DE',
-        }}
-      >
-        <input
-          className="flex-1 text-sm outline-none bg-transparent"
-          placeholder="메시지를 입력하세요..."
-          style={{ color: '#242227' }}
-        />
-        <button
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ background: '#6633CC' }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M22 2L11 13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" strokeWidth="2" strokeLinejoin="round" />
-          </svg>
-        </button>
+      {/* ── 채팅 콘텐츠 ── */}
+      <div style={{ flex: 1, paddingLeft: 16, paddingRight: 16, paddingTop: 6, paddingBottom: 100 }}>
+
+        {/* 인사 그라디언트 텍스트 */}
+        <p style={{
+          fontSize: 24, fontWeight: 500, lineHeight: 1.4, marginBottom: 16,
+          background: 'linear-gradient(135deg, #B38BFF 0%, #A1B0FF 50%, #D4B8FF 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text', color: 'transparent',
+        }}>
+          구르님의 전담 뷰티 전문가<br />미유입니다.
+        </p>
+
+        {/* 피부 기록 카드 */}
+        <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 16, width: '100%' }}>
+          <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
+            현재 구르님의 피부 데이터를 모두 파악하고<br />있습니다.
+          </p>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+              <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, borderRadius: 6, display: 'block', flexShrink: 0 }} />
+              <p style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1.5 }}>구르님의 피부 기록</p>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#9D9AA3' }}>11/29</span>
+            </div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {SKIN_CHIPS.map(c => <span key={c} style={skinChipStyle}>{c}</span>)}
+            </div>
+          </div>
+          <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5 }}>
+            오늘은 어떤 고민이 있으신가요?<br />
+            정확한 솔루션을 제시해드리겠습니다.
+          </p>
+        </div>
+
+        {/* 카테고리 버튼 */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: messages.length > 0 ? 12 : 0 }}>
+          {CATEGORIES.map(({ label, key }) => (
+            <button key={key} onClick={() => handleCategory(key)}
+              style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* 동적 메시지 */}
+        {messages.map((msg, idx) => renderMessage(msg, idx))}
+
+        {/* GPT 응답 로딩 인디케이터 */}
+        {isTyping && (
+          <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 12, display: 'inline-block' }}>
+            <p style={{ fontSize: 15, fontWeight: 400, color: '#9D9AA3', margin: 0, lineHeight: 1.5, whiteSpace: 'nowrap' }}>
+              미유가 답변을 작성 중입니다...
+            </p>
+          </div>
+        )}
+
+        <div ref={bottomRef} />
       </div>
+
+      {/* ── 입력창 ── */}
+      <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#FFFFFF', paddingLeft: 20, paddingRight: 20, paddingTop: 8, paddingBottom: 20, zIndex: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, backgroundColor: '#F7F6F9', borderRadius: 99, width: 350, height: 60, padding: '16px 20px', boxSizing: 'border-box' }}>
+          <button style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, display: 'flex' }}>
+            <img src={cameraIcon} alt="카메라" style={{ width: 28, height: 28, display: 'block' }} />
+          </button>
+          <input
+            className="miyubot-input"
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+            style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontWeight: 400, color: '#242227', lineHeight: 1.4, backgroundColor: 'transparent', letterSpacing: '-0.01em' }}
+            placeholder="원하는 고민을 입력해주세요"
+          />
+          <button
+            onClick={handleSend}
+            disabled={isTyping || !inputValue.trim()}
+            style={{ background: 'none', border: 'none', cursor: isTyping || !inputValue.trim() ? 'default' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, opacity: isTyping || !inputValue.trim() ? 0.4 : 1, transition: 'opacity 0.15s' }}
+          >
+            <img src={sendIcon} alt="전송" style={{ width: 28, height: 28, display: 'block' }} />
+          </button>
+        </div>
+      </div>
+
     </div>
   )
 }
