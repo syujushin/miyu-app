@@ -7,6 +7,7 @@ import logoIcon      from '../../assets/logo/logo-icon-square.svg'
 import homeIcon      from '../../assets/Icon/home-inactive.svg'
 import menuIcon      from '../../assets/Icon/ui/icon-menu.svg'
 import newChatIcon   from '../../assets/Icon/ui/Top/icon-newchat.svg'
+import chevronIcon   from '../../assets/Icon/ui/Recommend/chevron.svg'
 import cameraIcon    from '../../assets/miyubot/Bottom/miyubot-camera.svg'
 import sendIcon      from '../../assets/miyubot/Bottom/miyubot-send.svg'
 import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
@@ -20,11 +21,35 @@ const SUGGESTION_CHIPS = [
   '봄웜 라이트 전용 신상 추천해줘',
   '코랄빛이 살짝 도는 로즈베이지색의 틴트 제품 추천해줘',
 ]
-import img11 from '../../assets/images/product/product-dummy-11.png'
-import img12 from '../../assets/images/product/product-dummy-12.png'
-import img13 from '../../assets/images/product/product-dummy-13.png'
+import img11 from '../../assets/images/product/product-blusher-vdl.png'
+import img12 from '../../assets/images/product/product-cheek-banilaco.png'
+import img13 from '../../assets/images/product/product-cheek-dasique.png'
 
-import { findProductByName } from '../../data/products'
+import { findProductByName, MIYU_PRODUCTS } from '../../data/products'
+
+/* ── 루틴 단계 데이터 ── */
+const ROUTINE_DATA = {
+  evening: {
+    intro: '무자극 보습 중심으로 피부 장벽을 안정시키는 게 우선이에요. 구르님의 피부 데이터를 기반으로 저녁 루틴 5단계를 추천드릴게요. 건조함, 민감성 피부에 맞춘 루틴이에요.',
+    steps: [
+      { step: 1, name: '토너',     reason: '저분자 히알루론산이 피부 깊숙이 수분을 채워주고 후속 제품 흡수력을 높여줘요',                       product: '토리든 다이브인 저분자 히알루론산 토너', price: '14,900' },
+      { step: 2, name: '앰플',     reason: '3종 세라마이드 복합체가 예민해진 피부 장벽을 집중적으로 회복시켜 자극을 줄여줘요',                   product: '앰플엔 세라마이드샷 앰플',             price: '14,900' },
+      { step: 3, name: '세럼',     reason: '스쿠알란 성분이 건조함을 채우고 민감성 피부에 자극 없이 수분막을 형성해줘요',                         product: '에스네이처 아쿠아 스쿠알란',           price: '24,000' },
+      { step: 4, name: '크림',     reason: '아토베리어 복합체가 피부 장벽을 강화하고 수분 손실을 막아 다음 날 촉촉함을 유지해줘요',               product: '에스트라 아토베리어365 크림 80ml',     price: '33,000' },
+      { step: 5, name: '수분 마스크', reason: '수면 중 피부 재생을 도우며 보습막을 형성해 건조한 아침 피부를 방지해줘요',                        product: '수면 수분 마스크팩',                   price: '(미구현)' },
+    ],
+  },
+  morning: {
+    intro: '외출 전 자외선과 환경 자극으로부터 피부를 보호하는 게 중요해요. 구르님의 피부 데이터를 기반으로 아침 루틴 5단계를 추천드릴게요. 가볍고 산뜻하게 흡수되는 제품 위주로 구성했어요.',
+    steps: [
+      { step: 1, name: '토너',     reason: '가볍고 산뜻하게 흡수되며 수분 공급과 동시에 피부 결을 정돈해줘요',                                 product: '파티온 포도당 하이드로 에센스 토너 500ml', price: '29,000' },
+      { step: 2, name: '세럼',     reason: '피디알엔 성분이 피부 장벽을 보호하면서 가볍게 흡수되어 속건조를 예방해줘요',                         product: '아누아 피디알엔 캡슐',                 price: '23,500' },
+      { step: 3, name: '크림',     reason: '가벼운 텍스처로 피부에 자연스럽게 흡수되어 메이크업 밀착력을 높여줘요',                               product: '에스트라 아토베리어365 크림 80ml',     price: '33,000' },
+      { step: 4, name: '선크림',   reason: 'SPF 50+ 자외선 차단으로 피부 광노화를 예방하고 민감성 피부에도 자극이 적어요',                       product: '자외선 차단제',                         price: '(미구현)' },
+      { step: 5, name: '베이스 마무리', reason: '피부 톤을 자연스럽게 정리하고 메이크업 지속력을 높여 외출 준비를 마무리해줘요',                  product: 'VDL 치크스테인 블러셔 01 바운딩 피치', price: '12,900' },
+    ],
+  },
+}
 
 const BLUSHER_PRODUCTS = [
   { id: 1, img: img11, name: 'VDL 치크스테인 블러셔',          price: '12,900', reason: '봄웜 피부에 딱 맞는 라이트 피치 발색으로 화사한 혈색을 연출해줘요' },
@@ -68,6 +93,112 @@ function UserBubble({ text }) {
       }}>
         {text}
       </div>
+    </div>
+  )
+}
+
+/* ── 루틴 단계 카드 아이템 ── */
+function RoutineStepItem({ step, name, reason, product, price }) {
+  const [liked, setLiked] = useState(false)
+  const found  = findProductByName(product)
+  const imgSrc = found?.img ?? null
+
+  return (
+    <div style={{ backgroundColor: '#F7F6F9', borderRadius: 16, padding: 16, display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 280 }}>
+      {/* 단계 헤더 */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <div style={{ width: 26, height: 26, borderRadius: 99, backgroundColor: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#6633CC' }}>{step}</span>
+          </div>
+          <span style={{ fontSize: 14, fontWeight: 600, color: '#242227', letterSpacing: '-0.01em' }}>{name}</span>
+        </div>
+        <img src={chevronIcon} alt="" style={{ width: 20, height: 20, display: 'block', flexShrink: 0 }} />
+      </div>
+
+      {/* 추천 이유 — 라벨 14 SemiBold, 서브텍스트 14 Regular */}
+      <div>
+        <p style={{ fontSize: 14, fontWeight: 600, color: '#6633CC', margin: '0 0 3px', lineHeight: 1.4 }}>추천 이유</p>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5 }}>{reason}</p>
+      </div>
+
+      {/* 제품 서브카드 — 흰색, 276×69, 패딩 12 */}
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: 10, padding: '12px 12px', height: 59, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 10 }}>
+        {imgSrc
+          ? <img src={imgSrc} alt={product} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
+          : <div style={{ width: 44, height: 44, borderRadius: 8, backgroundColor: '#E3D4FD', flexShrink: 0 }} />
+        }
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{product}</p>
+          <p style={{ margin: '-3px 0 0', lineHeight: 1.4 }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#6633CC' }}>{price}</span>
+            {price !== '(미구현)' && <span style={{ fontSize: 10, color: '#242227', marginLeft: 1 }}>원</span>}
+          </p>
+        </div>
+        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, pointerEvents: 'auto' }}>
+          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ── 루틴 응답 전체 (텍스트 + 5단계 카드) ── */
+function RoutineResponse({ timeSlot }) {
+  const data = ROUTINE_DATA[timeSlot]
+  if (!data) return null
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
+      {/* 인트로 텍스트 카드 */}
+      <div style={{ ...botCardStyle }}>
+        <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6 }}>
+          {data.intro}
+        </p>
+      </div>
+      {/* 5단계 스텝 카드 */}
+      {data.steps.map(s => <RoutineStepItem key={s.step} {...s} />)}
+    </div>
+  )
+}
+
+/* ── 기초케어 초기 카드 (피부 기록 + 질문) ── */
+function SkincareInitCard() {
+  return (
+    <div style={{ ...botCardStyle, marginBottom: 20 }}>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
+        구르님의 최근 피부 상태를 알려드릴게요.
+      </p>
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 14px', marginBottom: 14 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 10 }}>
+          <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, borderRadius: 6, display: 'block', flexShrink: 0 }} />
+          <p style={{ flex: 1, fontSize: 14, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1.5 }}>구르님의 피부 기록</p>
+          <span style={{ fontSize: 12, fontWeight: 400, color: '#9D9AA3' }}>11/29</span>
+        </div>
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+          {SKIN_CHIPS.map(c => <span key={c} style={skinChipStyle}>{c}</span>)}
+        </div>
+      </div>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5 }}>
+        오늘은 어떤 고민이 있으신가요?<br />
+        정확한 솔루션을 제시해드리겠습니다.
+      </p>
+    </div>
+  )
+}
+
+/* ── 루틴 시간대 선택 칩 ── */
+function RoutineChips({ onSelect }) {
+  return (
+    <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 20 }}>
+      {['아침 외출 전', '저녁 외출 후'].map(label => (
+        <button
+          key={label}
+          onClick={() => onSelect(label)}
+          style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
+        >
+          {label}
+        </button>
+      ))}
     </div>
   )
 }
@@ -119,9 +250,9 @@ function BlusherProductCard({ img, name, price, reason }) {
   const [liked, setLiked] = useState(false)
   return (
     <div style={{
-      width: 300,
+      width: 320,
       borderRadius: 20,
-      backgroundColor: '#F6F2FF',
+      backgroundColor: '#F7F6F9',
       padding: 16,
       flexShrink: 0,
       display: 'flex',
@@ -165,7 +296,7 @@ function BlusherProductCard({ img, name, price, reason }) {
         <p style={{ fontSize: 14, fontWeight: 700, color: '#6633CC', margin: '0 0 2px', lineHeight: 1.5 }}>
           추천 이유
         </p>
-        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, minHeight: 42, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
           {reason}
         </p>
       </div>
@@ -225,7 +356,7 @@ function GptProductCard({ name, price, reason }) {
   const imgSrc = found?.img ?? null
 
   return (
-    <div style={{ width: 300, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
+    <div style={{ width: 320, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
       {/* 흰색 제품 영역 */}
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 12px', height: 69, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12 }}>
         {imgSrc
@@ -246,7 +377,7 @@ function GptProductCard({ name, price, reason }) {
       {/* 추천 이유 */}
       <div>
         <p style={{ fontSize: 14, fontWeight: 700, color: '#6633CC', margin: '0 0 2px', lineHeight: 1.5 }}>추천 이유</p>
-        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{reason}</p>
+        <p style={{ fontSize: 14, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, minHeight: 42, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{reason}</p>
       </div>
       {/* 구매하기 */}
       <button style={{ width: '100%', height: 44, padding: 0, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 14, fontWeight: 500, lineHeight: 1.5, letterSpacing: '-0.01em', pointerEvents: 'auto', boxSizing: 'border-box' }}>
@@ -302,10 +433,11 @@ function SuggestionChips({ items, onChipClick }) {
 /* ── 메인 페이지 ── */
 export default function MiyubotPage() {
   const navigate  = useNavigate()
-  const [messages,   setMessages]   = useState([])
-  const [inputValue, setInputValue] = useState('')
-  const [isTyping,   setIsTyping]   = useState(false)
-  const [gptHistory, setGptHistory] = useState([])  // GPT 대화 컨텍스트
+  const [messages,     setMessages]   = useState([])
+  const [inputValue,   setInputValue] = useState('')
+  const [isTyping,     setIsTyping]   = useState(false)
+  const [gptHistory,   setGptHistory] = useState([])  // GPT 대화 컨텍스트
+  const [gptTurnCount, setGptTurnCount] = useState(0) // GPT 응답 횟수 (1턴=첫 응답)
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -317,10 +449,30 @@ export default function MiyubotPage() {
     setGptHistory([])
     setInputValue('')
     setIsTyping(false)
+    setGptTurnCount(0)
+  }
+
+  const handleRoutineSelect = (label) => {
+    const timeSlot = label === '아침 외출 전' ? 'morning' : 'evening'
+    // GPT 컨텍스트에 선택 기록 (이후 대화에서 활용)
+    const userMsg = { role: 'user', content: label }
+    const assistantCtx = { role: 'assistant', content: `${label} 루틴 5단계를 추천드렸습니다.` }
+    setGptHistory(prev => [...prev, userMsg, assistantCtx])
+    setMessages(prev => [
+      ...prev,
+      { type: 'user', text: label },
+      { type: 'bot-routine', timeSlot },
+    ])
   }
 
   const handleCategory = (key) => {
-    if (key === 'makeup') {
+    if (key === 'skincare') {
+      setMessages(prev => [
+        ...prev,
+        { type: 'user', text: '기초케어' },
+        { type: 'bot-skincare' },
+      ])
+    } else if (key === 'makeup') {
       setMessages(prev => [
         ...prev,
         { type: 'user', text: '메이크업' },
@@ -374,26 +526,34 @@ export default function MiyubotPage() {
       // JSON 파싱 → message + recommended_products 분리
       const strip = (t) => (t ?? '').replace(/\*\*/g, '').trim()
 
-      let msgText     = strip(raw)
-      let products    = []
-      let showOptions = false
+      let msgText          = strip(raw)
+      let products         = []
+      let showOptions      = false
+      let showRoutineChips = false
       try {
         const parsed = JSON.parse(raw)
-        msgText     = strip(parsed.message ?? raw)
-        products    = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
-        showOptions = parsed.show_options === true
+        msgText          = strip(parsed.message ?? raw)
+        products         = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
+        showOptions      = parsed.show_options === true
+        showRoutineChips = parsed.show_routine_chips === true
       } catch {
         const match = raw.match(/\{[\s\S]*\}/)
         if (match) {
           try {
             const parsed = JSON.parse(match[0])
-            msgText     = strip(parsed.message ?? raw)
-            products    = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
-            showOptions = parsed.show_options === true
+            msgText          = strip(parsed.message ?? raw)
+            products         = Array.isArray(parsed.recommended_products) ? parsed.recommended_products : []
+            showOptions      = parsed.show_options === true
+            showRoutineChips = parsed.show_routine_chips === true
           } catch { /* 파싱 실패 시 원문 그대로 */ }
         }
       }
-      setMessages(prev => [...prev, { type: 'bot-gpt', text: msgText, products, showOptions }])
+      // 1턴째(첫 GPT 응답)에서는 showRoutineChips를 강제 차단
+      const newTurn = gptTurnCount + 1
+      setGptTurnCount(newTurn)
+      const guardedRoutineChips = newTurn >= 2 ? showRoutineChips : false
+
+      setMessages(prev => [...prev, { type: 'bot-gpt', text: msgText, products, showOptions, showRoutineChips: guardedRoutineChips }])
     } catch {
       setMessages(prev => [...prev, { type: 'bot-error' }])
     } finally {
@@ -404,6 +564,8 @@ export default function MiyubotPage() {
   const renderMessage = (msg, idx) => {
     switch (msg.type) {
       case 'user':               return <UserBubble key={idx} text={msg.text} />
+      case 'bot-skincare':       return <SkincareInitCard key={idx} />
+      case 'bot-routine':        return <RoutineResponse key={idx} timeSlot={msg.timeSlot} />
       case 'bot-makeup':         return <MakeupBotCard key={idx} />
       case 'chips':              return <SuggestionChips key={idx} items={msg.items} onChipClick={handleSuggestion} />
       case 'bot-blusher-text':   return <BlusherTextCard key={idx} />
@@ -417,6 +579,11 @@ export default function MiyubotPage() {
               </p>
             </div>
             {msg.products?.length > 0 && <GptProductScroll products={msg.products} />}
+            {msg.showRoutineChips && (
+              <RoutineChips onSelect={(label) => {
+                handleRoutineSelect(label)
+              }} />
+            )}
             {msg.showOptions && !msg.products?.length && (
               <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 12 }}>
                 {['제품 추천', '루틴 추천'].map(label => (
@@ -455,7 +622,7 @@ export default function MiyubotPage() {
                       border: 'none',
                       cursor: 'pointer',
                       fontSize: 14,
-                      fontWeight: 600,
+                      fontWeight: 500,
                       color: '#6633CC',
                       lineHeight: 1.5,
                       letterSpacing: '-0.01em',
@@ -481,13 +648,15 @@ export default function MiyubotPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', backgroundColor: '#FFFFFF' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#FFFFFF' }}>
 
       {/* ── 헤더 ── */}
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#FFFFFF' }}>
         <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
         <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 20, paddingRight: 16 }}>
-          <img src={logoSvg} alt="miyu" style={{ width: 84, height: 29, display: 'block' }} />
+          <button onClick={() => navigate('/')} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+            <img src={logoSvg} alt="miyu" style={{ width: 84, height: 29, display: 'block' }} />
+          </button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {/* 새 대화 초기화 버튼 */}
             <button onClick={resetChat} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
@@ -504,7 +673,7 @@ export default function MiyubotPage() {
       </div>
 
       {/* ── 채팅 콘텐츠 ── */}
-      <div style={{ flex: 1, paddingLeft: 16, paddingRight: 16, paddingTop: 6, paddingBottom: 100 }}>
+      <div style={{ flex: 1, paddingLeft: 16, paddingRight: 16, paddingTop: 6, paddingBottom: 24, overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}>
 
         {/* 인사 그라디언트 텍스트 */}
         <p style={{
@@ -517,7 +686,7 @@ export default function MiyubotPage() {
         </p>
 
         {/* 피부 기록 카드 */}
-        <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 16, width: '100%' }}>
+        <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 16, width: '100%', maxWidth: 320 }}>
           <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
             현재 구르님의 피부 데이터를 모두 파악하고<br />있습니다.
           </p>
@@ -541,7 +710,7 @@ export default function MiyubotPage() {
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: messages.length > 0 ? 12 : 0 }}>
           {CATEGORIES.map(({ label, key }) => (
             <button key={key} onClick={() => handleCategory(key)}
-              style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
+              style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
             >
               {label}
             </button>

@@ -1,19 +1,19 @@
 import addIcon      from '../../assets/images/home/add.svg'
 import weatherSunny from '../../assets/Icon/weather/weather-sunny.svg'
 
-import img04 from '../../assets/images/product/product-dummy-04.png'
-import img01 from '../../assets/images/product/product-dummy-01.png'
-import img05 from '../../assets/images/product/product-dummy-05.png'
-import img06 from '../../assets/images/product/product-dummy-06.png'
+import imgPcalm      from '../../assets/images/product/product-mist-pcalm.png'
+import imgCetaphil   from '../../assets/images/product/product-lotion-cetaphil.png'
+import imgCosrxPatch from '../../assets/images/product/product-troublepatch-cosrx.png'
+import imgMixsoon    from '../../assets/images/product/product-eyecream-mixsoon.png'
 
 import HorizontalScroll from './shared/HorizontalScroll'
 
 /* 추후 실제 이미지로 교체 예정 */
 const PRODUCTS = [
-  { id: 1, img: img04, name: '에스네이처', detail: '아쿠아 오아시스 토너 200ml', price: '24,000' },
-  { id: 2, img: img01, name: '아누아',     detail: '피디알엔 캡슐 100 세럼 50ml', price: '23,500' },
-  { id: 3, img: img05, name: '에스네이처', detail: '아쿠아 스쿠알란 세럼 50ml',   price: '23,500' },
-  { id: 4, img: img06, name: '아떼',       detail: '비건 릴리프 크림 50ml',       price: '34,000', imgOffsetX: -11 },
+  { id: 1, img: imgPcalm,      name: 'P.CALM',   detail: '민감진정 수분 미스트',                   price: '16,000' },
+  { id: 2, img: imgCetaphil,   name: '갈더마',    detail: '세타필 모이스처라이징 로션',              price: '19,000' },
+  { id: 3, img: imgCosrxPatch, name: '코스알엑스', detail: '아크네 핌플 마스터 패치',                price: '6,500'  },
+  { id: 4, img: imgMixsoon,    name: '믹순',      detail: '콩 아이크림 20ml',                      price: '19,500' },
 ]
 
 /* 95×151(허그), 패딩 top8 right0 bottom8 left8, 태그/컨트롤 없음 */

@@ -11,8 +11,8 @@ export default function AppLayout() {
   const { pathname } = useLocation()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative' }}>
-      <main style={{ flex: 1, overflowY: 'auto' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflowX: 'hidden' }}>
+      <main style={{ flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}>
         <Outlet />
       </main>
 

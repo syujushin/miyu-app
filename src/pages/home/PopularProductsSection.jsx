@@ -2,27 +2,26 @@ import { useRef, useState } from 'react'
 import addIcon     from '../../assets/images/home/add.svg'
 import controlIcon from '../../assets/Icon/control.svg'
 
-import img01 from '../../assets/images/product/product-dummy-01.png'
-import img02 from '../../assets/images/product/product-dummy-02.png'
-import img03 from '../../assets/images/product/product-dummy-03.png'
-import img04 from '../../assets/images/product/product-dummy-04.png'
+import img01 from '../../assets/images/product/product-toner-esnature-oasis.webp'
+import img02 from '../../assets/images/product/product-capsule-anua.png'
+import img03 from '../../assets/images/product/product-squalane-esnature.png'
+import img04 from '../../assets/images/product/product-suncream-atte.webp'
 
-/* 추후 실제 이미지로 교체 예정 */
 const PRODUCTS = [
   {
     id: 1,
     img: img01,
-    name: '아누아',
-    detail: '피디알엔 캡슐 100 세럼 50ml 대용량 기획',
-    price: '23,500',
+    name: '에스네이처',
+    detail: '아쿠아 오아시스 토너 200ml',
+    price: '24,000',
     tags: ['Miyu Only', '1+1'],
   },
   {
     id: 2,
     img: img02,
-    name: '비노트',
-    detail: '물톡스 부스터 앰플 30ml',
-    price: '35,900',
+    name: '아누아',
+    detail: '피디알엔 캡슐 100 세럼 50ml',
+    price: '23,500',
     tags: ['Miyu Only', '1+1'],
   },
   {
@@ -36,9 +35,9 @@ const PRODUCTS = [
   {
     id: 4,
     img: img04,
-    name: '에스네이처',
-    detail: '아쿠아 오아시스 토너 300ml',
-    price: '24,000',
+    name: '아떼',
+    detail: '비건 릴리프 크림 50ml',
+    price: '34,000',
     tags: ['Miyu Only'],
   },
 ]
