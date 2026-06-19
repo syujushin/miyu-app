@@ -1,6 +1,16 @@
+import useWeather from '../../hooks/useWeather'
+import { getWeatherSvg } from '../../utils/weatherSvg'
 import closeIcon from '../../assets/Icon/weather/minus.svg'
 
 export default function WeatherBanner({ onClose }) {
+  const { data, loading, error } = useWeather()
+
+  const tipText = loading
+    ? '날씨 정보를 불러오는 중이에요...'
+    : error || !data
+      ? '오늘도 건강한 피부 관리 잊지 마세요!'
+      : data.tip
+
   return (
     <div
       style={{
@@ -10,7 +20,6 @@ export default function WeatherBanner({ onClose }) {
         padding: '4px 8px 4px 16px',
         height: 38,
         flexShrink: 0,
-        /* 피부점수 카드 글래스와 동일한 효과 */
         background: 'rgba(206, 183, 250, 0.10)',
         backdropFilter: 'blur(6px)',
         WebkitBackdropFilter: 'blur(6px)',
@@ -22,24 +31,30 @@ export default function WeatherBanner({ onClose }) {
         ].join(', '),
       }}
     >
-      {/* 날씨 아이콘 🌤️ */}
-      <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1 }}>🌤️</span>
+      <img
+        src={getWeatherSvg(data?.weatherId)}
+        alt="날씨 아이콘"
+        width={26}
+        height={26}
+        style={{ flexShrink: 0, display: 'block' }}
+      />
 
-      {/* 텍스트 */}
+      {/* 팁 텍스트 */}
       <p
         style={{
           flex: 1,
           fontSize: 12,
           fontWeight: 400,
-          color: '#6633CC',
+          color: loading ? '#9D9AA3' : '#6633CC',
           margin: 0,
           lineHeight: 1.4,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
+          transition: 'color 0.3s ease',
         }}
       >
-        오늘은 맑고 건조해요. 보습에 신경 써주세요!
+        {tipText}
       </p>
 
       {/* 닫기 버튼 */}

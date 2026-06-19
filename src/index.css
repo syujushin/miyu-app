@@ -58,6 +58,95 @@
   display: none;
 }
 
+/* ─────────────────────────────────────
+   Page Transitions
+───────────────────────────────────── */
+@keyframes slideFromRight {
+  from { transform: translateX(28px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes slideFromLeft {
+  from { transform: translateX(-28px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+@keyframes fadeInUp {
+  from { transform: translateY(18px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.page-from-right { animation: slideFromRight 0.3s ease forwards; will-change: transform, opacity; }
+.page-from-left  { animation: slideFromLeft  0.3s ease forwards; will-change: transform, opacity; }
+.page-from-below { animation: fadeInUp       0.3s ease forwards; will-change: transform, opacity; }
+.page-fade       { animation: fadeIn         0.25s ease forwards; }
+
+/* ─────────────────────────────────────
+   Stagger (Home sections)
+───────────────────────────────────── */
+@keyframes staggerIn {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.stagger   { opacity: 0; animation: staggerIn 0.4s ease forwards; }
+.stagger-1 { animation-delay: 0.04s; }
+.stagger-2 { animation-delay: 0.10s; }
+.stagger-3 { animation-delay: 0.16s; }
+.stagger-4 { animation-delay: 0.22s; }
+.stagger-5 { animation-delay: 0.28s; }
+.stagger-6 { animation-delay: 0.34s; }
+.stagger-7 { animation-delay: 0.40s; }
+
+/* ─────────────────────────────────────
+   Chat message animations
+───────────────────────────────────── */
+@keyframes msgUser {
+  from { transform: translateX(14px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes msgBot {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.msg-user { animation: msgUser 0.25s ease forwards; will-change: transform, opacity; }
+.msg-bot  { animation: msgBot  0.3s  ease forwards; will-change: transform, opacity; }
+
+/* ─────────────────────────────────────
+   Loading dots
+───────────────────────────────────── */
+@keyframes dotPulse {
+  0%, 60%, 100% { opacity: 0.25; transform: scale(0.75); }
+  30%            { opacity: 1;    transform: scale(1);    }
+}
+.dot-1 { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #9D9AA3; animation: dotPulse 1.2s ease infinite 0s;   }
+.dot-2 { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #9D9AA3; animation: dotPulse 1.2s ease infinite 0.2s;  }
+.dot-3 { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #9D9AA3; animation: dotPulse 1.2s ease infinite 0.4s;  }
+
+/* ─────────────────────────────────────
+   Heart bounce
+───────────────────────────────────── */
+@keyframes heartPop {
+  0%   { transform: scale(1);    }
+  35%  { transform: scale(1.35); }
+  65%  { transform: scale(0.88); }
+  100% { transform: scale(1);    }
+}
+.heart-pop { animation: heartPop 0.28s ease forwards; }
+
+/* ─────────────────────────────────────
+   Button press feedback (global)
+───────────────────────────────────── */
+button {
+  transition: transform 0.1s ease, opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+button:active {
+  transform: scale(0.96);
+  opacity: 0.82;
+}
+
 .miyubot-input::placeholder {
   color: #9D9AA3;
   font-size: 16px;

@@ -66,6 +66,22 @@ const CATEGORIES = [
   { label: '피부진단',  key: 'diagnosis' },
 ]
 
+/* ── 제품 이미지 — src 없거나 로드 실패 시 브랜드 플레이스홀더 표시 ── */
+function ProductImg({ src, name, size = 44 }) {
+  const [err, setErr] = useState(false)
+  if (!src || err) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: 8, backgroundColor: '#F0E9FF', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={logoIcon} alt="" style={{ width: Math.round(size * 0.55), height: Math.round(size * 0.55), borderRadius: 4, display: 'block' }} />
+      </div>
+    )
+  }
+  return (
+    <img src={src} alt={name} draggable={false} onError={() => setErr(true)}
+      style={{ width: size, height: size, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
+  )
+}
+
 /* ── 공통 스타일 ── */
 const skinChipStyle = {
   fontSize: 12, fontWeight: 400, color: '#242227',
@@ -84,7 +100,7 @@ const botCardStyle = {
 /* ── 사용자 말풍선 ── */
 function UserBubble({ text }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+    <div className="msg-user" style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
       <div style={{
         backgroundColor: '#6633CC',
         borderRadius: '20px 0 20px 20px',
@@ -96,6 +112,24 @@ function UserBubble({ text }) {
         {text}
       </div>
     </div>
+  )
+}
+
+/* ── 하트 버튼 (바운스 포함) ── */
+function HeartButton({ size = 20 }) {
+  const [liked, setLiked] = useState(false)
+  const [pop,   setPop]   = useState(false)
+  const toggle = () => {
+    setLiked(p => !p)
+    setPop(true)
+    setTimeout(() => setPop(false), 300)
+  }
+  return (
+    <button onClick={toggle} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, alignSelf: 'center', pointerEvents: 'auto' }}>
+      <img src={liked ? heartActive : heartInactive} alt="좋아요"
+        className={pop ? 'heart-pop' : ''}
+        style={{ width: size, height: size, display: 'block', transition: 'none' }} />
+    </button>
   )
 }
 
@@ -126,10 +160,7 @@ function RoutineStepItem({ step, name, reason, product, price }) {
 
       {/* 제품 서브카드 — 흰색, 276×69, 패딩 12 */}
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: 10, padding: '12px 12px', height: 59, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 10 }}>
-        {imgSrc
-          ? <img src={imgSrc} alt={product} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
-          : <div style={{ width: 44, height: 44, borderRadius: 8, backgroundColor: '#E3D4FD', flexShrink: 0 }} />
-        }
+        <ProductImg src={imgSrc} name={product} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{product}</p>
           <p style={{ margin: '-3px 0 0', lineHeight: 1.4 }}>
@@ -137,9 +168,7 @@ function RoutineStepItem({ step, name, reason, product, price }) {
             <span style={{ fontSize: 10, color: '#242227', marginLeft: 1 }}>원</span>
           </p>
         </div>
-        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, pointerEvents: 'auto' }}>
-          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
-        </button>
+        <HeartButton />
       </div>
     </div>
   )
@@ -346,8 +375,7 @@ function BlusherProductCard({ img, name, price, reason }) {
         alignItems: 'center',
         gap: 12,
       }}>
-        {/* 제품 이미지 44×44 */}
-        <img src={img} alt={name} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
+        <ProductImg src={img} name={name} />
 
         {/* 제품명 + 가격 */}
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -360,10 +388,7 @@ function BlusherProductCard({ img, name, price, reason }) {
           </p>
         </div>
 
-        {/* 하트 */}
-        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, alignSelf: 'center', pointerEvents: 'auto' }}>
-          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
-        </button>
+        <HeartButton />
       </div>
 
       {/* 추천 이유 라벨 + 텍스트 (줄바꿈) */}
@@ -434,10 +459,7 @@ function GptProductCard({ name, price, reason }) {
     <div style={{ width: 280, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
       {/* 흰색 제품 영역 */}
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 12px', height: 69, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12 }}>
-        {imgSrc
-          ? <img src={imgSrc} alt={name} draggable={false} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 8, flexShrink: 0, display: 'block' }} />
-          : <div style={{ width: 44, height: 44, borderRadius: 8, backgroundColor: '#F0EFF3', flexShrink: 0 }} />
-        }
+        <ProductImg src={imgSrc} name={name} />
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: '0 0 3px', lineHeight: 1.4, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{name}</p>
           <p style={{ margin: 0, lineHeight: 1 }}>
@@ -445,9 +467,7 @@ function GptProductCard({ name, price, reason }) {
             <span style={{ fontSize: 11, fontWeight: 400, color: '#242227', marginLeft: 1 }}>원</span>
           </p>
         </div>
-        <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, alignSelf: 'center', pointerEvents: 'auto' }}>
-          <img src={liked ? heartActive : heartInactive} alt="좋아요" style={{ width: 20, height: 20, display: 'block' }} />
-        </button>
+        <HeartButton />
       </div>
       {/* 추천 이유 */}
       <div>
@@ -529,9 +549,19 @@ export default function MiyubotPage() {
     setGptTurnCount(0)
   }
 
+  // 점 세개 표시 후 봇 메시지 추가 (프리메이드 응답용)
+  const showTypingThen = (botMsgs, delay = 900) => {
+    setIsTyping(true)
+    setTimeout(() => {
+      setMessages(prev => [...prev, ...botMsgs])
+      setIsTyping(false)
+    }, delay)
+  }
+
   const handleDiagnosisAction = (label) => {
     if (label === '피부 상태 재진단 방법') {
-      setMessages(prev => [...prev, { type: 'user', text: label }, { type: 'bot-diagnosis-method' }])
+      setMessages(prev => [...prev, { type: 'user', text: label }])
+      showTypingThen([{ type: 'bot-diagnosis-method' }])
     } else {
       // TODO: 피부 진단 기록보기 연동 예정
       console.log('피부 진단 기록보기')
@@ -539,29 +569,24 @@ export default function MiyubotPage() {
   }
 
   const handleRoutineSelect = (label) => {
+    if (isTyping) return
     const timeSlot = label === '아침 외출 전' ? 'morning' : 'evening'
-    // GPT 컨텍스트에 선택 기록 (이후 대화에서 활용)
-    const userMsg = { role: 'user', content: label }
-    const assistantCtx = { role: 'assistant', content: `${label} 루틴 5단계를 추천드렸습니다.` }
-    setGptHistory(prev => [...prev, userMsg, assistantCtx])
-    setMessages(prev => [
-      ...prev,
-      { type: 'user', text: label },
-      { type: 'bot-routine', timeSlot },
+    setGptHistory(prev => [...prev,
+      { role: 'user', content: label },
+      { role: 'assistant', content: `${label} 루틴 5단계를 추천드렸습니다.` },
     ])
+    setMessages(prev => [...prev, { type: 'user', text: label }])
+    showTypingThen([{ type: 'bot-routine', timeSlot }])
   }
 
   const handleCategory = (key) => {
+    if (isTyping) return
     if (key === 'skincare') {
-      setMessages(prev => [
-        ...prev,
-        { type: 'user', text: '기초케어' },
-        { type: 'bot-skincare' },
-      ])
+      setMessages(prev => [...prev, { type: 'user', text: '기초케어' }])
+      showTypingThen([{ type: 'bot-skincare' }])
     } else if (key === 'makeup') {
-      setMessages(prev => [
-        ...prev,
-        { type: 'user', text: '메이크업' },
+      setMessages(prev => [...prev, { type: 'user', text: '메이크업' }])
+      showTypingThen([
         { type: 'bot-makeup' },
         { type: 'chips', items: SUGGESTION_CHIPS },
       ])
@@ -599,15 +624,16 @@ export default function MiyubotPage() {
         .catch(() => setMessages(p => [...p, { type: 'bot-error' }]))
         .finally(() => setIsTyping(false))
     } else if (key === 'diagnosis') {
-      setMessages(prev => [...prev, { type: 'user', text: '피부진단' }, { type: 'bot-skin-diagnosis' }])
+      setMessages(prev => [...prev, { type: 'user', text: '피부진단' }])
+      showTypingThen([{ type: 'bot-skin-diagnosis' }])
     }
   }
 
   const handleSuggestion = (text) => {
+    if (isTyping) return
     if (text === '무화과 메이크업에 어울리는 블러셔를 찾고 있어') {
-      setMessages(prev => [
-        ...prev,
-        { type: 'user', text: '무화과 메이크업에 어울리는\n블러셔를 찾고 있어' },
+      setMessages(prev => [...prev, { type: 'user', text: '무화과 메이크업에 어울리는\n블러셔를 찾고 있어' }])
+      showTypingThen([
         { type: 'bot-blusher-text' },
         { type: 'bot-blusher-products' },
       ])
@@ -720,7 +746,7 @@ export default function MiyubotPage() {
       case 'bot-blusher-products': return <BlusherProductScroll key={idx} />
       case 'bot-gpt':
         return (
-          <div key={idx} style={{ marginBottom: 20 }}>
+          <div key={idx} className="msg-bot" style={{ marginBottom: 20 }}>
             <div style={{ ...botCardStyle, marginBottom: msg.products?.length ? 8 : 0 }}>
               <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                 {msg.text}
@@ -785,7 +811,7 @@ export default function MiyubotPage() {
         )
       case 'bot-error':
         return (
-          <div key={idx} style={{ ...botCardStyle, marginBottom: 20 }}>
+          <div key={idx} className="msg-bot" style={{ ...botCardStyle, marginBottom: 20 }}>
             <p style={{ fontSize: 15, fontWeight: 400, color: '#9D9AA3', margin: 0, lineHeight: 1.5 }}>
               죄송해요, 지금은 답변을 드리기 어려워요. 잠시 후 다시 시도해주세요.
             </p>
@@ -801,7 +827,7 @@ export default function MiyubotPage() {
       {/* ── 헤더 ── */}
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#FFFFFF' }}>
         <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
-        <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 20, paddingRight: 16 }}>
+        <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16 }}>
           <button onClick={() => navigate('/')} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
             <img src={logoSvg} alt="miyu" style={{ width: 84, height: 29, display: 'block' }} />
           </button>
@@ -824,7 +850,7 @@ export default function MiyubotPage() {
       <div style={{ flex: 1, paddingLeft: 16, paddingRight: 16, paddingTop: 6, paddingBottom: 24, overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}>
 
         {/* 인사 그라디언트 텍스트 */}
-        <p style={{
+        <p className="stagger stagger-1" style={{
           fontSize: 24, fontWeight: 500, lineHeight: 1.4, marginBottom: 16,
           background: 'linear-gradient(135deg, #B38BFF 0%, #A1B0FF 50%, #D4B8FF 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
@@ -834,7 +860,7 @@ export default function MiyubotPage() {
         </p>
 
         {/* 피부 기록 카드 */}
-        <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 16, width: '100%', maxWidth: 320 }}>
+        <div className="stagger stagger-2" style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 16, width: '100%', maxWidth: 320 }}>
           <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
             현재 구르님의 피부 데이터를 모두 파악하고<br />있습니다.
           </p>
@@ -855,7 +881,7 @@ export default function MiyubotPage() {
         </div>
 
         {/* 카테고리 버튼 */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: messages.length > 0 ? 12 : 0 }}>
+        <div className="stagger stagger-3" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: messages.length > 0 ? 12 : 0 }}>
           {CATEGORIES.map(({ label, key }) => (
             <button key={key} onClick={() => handleCategory(key)}
               style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
@@ -870,10 +896,10 @@ export default function MiyubotPage() {
 
         {/* GPT 응답 로딩 인디케이터 */}
         {isTyping && (
-          <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 20, display: 'inline-block' }}>
-            <p style={{ fontSize: 15, fontWeight: 400, color: '#9D9AA3', margin: 0, lineHeight: 1.5, whiteSpace: 'nowrap' }}>
-              미유가 답변을 작성 중입니다...
-            </p>
+          <div className="msg-bot" style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: '16px 20px', marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span className="dot-1" />
+            <span className="dot-2" />
+            <span className="dot-3" />
           </div>
         )}
 

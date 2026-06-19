@@ -5,12 +5,12 @@ import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
 
 import imgPartion       from '../../assets/images/product/product-toner-partion.png'
 import imgDasiqueCheek  from '../../assets/images/product/product-cheek-dasique.png'
-import imgAnua          from '../../assets/images/product/product-capsule-anua.png'
 import imgBergamot      from '../../assets/images/product/product-innerbeauty-bergamot-collagen.jpg'
 import imgMakeon        from '../../assets/images/product/product-device-makeon.png'
+import imgMediheal      from '../../assets/images/product/product-mask-mediheal.png'
 
 const CATEGORIES = ['스킨케어', '메이크업', '이너뷰티', '디바이스', '마스크팩']
-// 이너뷰티: id 3(아누아-이너뷰티분류), id 4(베르가못) / 디바이스: id 5(메이크온)
+// 이너뷰티: id 4(베르가못) / 디바이스: id 5(메이크온)
 
 /* 추후 실제 이미지 및 API 연동 예정 */
 const REVIEW_ITEMS = [
@@ -39,18 +39,6 @@ const REVIEW_ITEMS = [
     author: '민지유',
   },
   {
-    id: 3,
-    img: imgAnua,
-    brand: '아누아',
-    name: '피디알엔 캡슐 100',
-    price: '23,500',
-    category: '이너뷰티',
-    rating: 5,
-    reviewText: '피부 장벽 강화에 정말 효과적이에요. 꾸준히 사용하니 예민했던 피부가 훨씬 안정되고 촉촉해졌어요. 향료 없이 순한 성분으로 민감성 피부에도 부담 없이 사용할 수 있어서 강력 추천해요.',
-    date: '2025.11.12',
-    author: '서유준',
-  },
-  {
     id: 4,
     img: imgBergamot,
     brand: '이너뷰티',
@@ -74,6 +62,18 @@ const REVIEW_ITEMS = [
     date: '2025.12.05',
     author: '뷰티러버',
   },
+  {
+    id: 6,
+    img: imgMediheal,
+    brand: '메디힐',
+    name: '티트리 케어 솔루션 에센셜 마스크',
+    price: '12,900',
+    category: '마스크팩',
+    rating: 5,
+    reviewText: '트러블이 올라올 것 같을 때마다 꺼내 쓰는 마스크팩이에요. 티트리 성분이 들어있지만 향이 자극적이지 않고 민감한 피부에도 순하게 잘 맞아요. 20분 정도 올려두면 붉기가 확 가라앉고 피부가 한결 진정되는 느낌이에요. 긴급 진정용으로 강력 추천해요!',
+    date: '2025.12.10',
+    author: '구르님',
+  },
 ]
 
 function StarRating({ rating }) {
@@ -93,6 +93,8 @@ function StarRating({ rating }) {
 
 function ReviewCard({ img, brand, name, price, rating, reviewText, date, author }) {
   const [liked, setLiked] = useState(false)
+  const [pop,   setPop]   = useState(false)
+  const toggle = () => { setLiked(p => !p); setPop(true); setTimeout(() => setPop(false), 300) }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -118,11 +120,12 @@ function ReviewCard({ img, brand, name, price, rating, reviewText, date, author 
           </p>
         </div>
         <button
-          onClick={() => setLiked(!liked)}
+          onClick={toggle}
           style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}
         >
           <img src={liked ? heartActive : heartInactive} alt="좋아요"
-            style={{ width: 24, height: 24, display: 'block' }} />
+            className={pop ? 'heart-pop' : ''}
+            style={{ width: 24, height: 24, display: 'block', transition: 'none' }} />
         </button>
       </div>
 

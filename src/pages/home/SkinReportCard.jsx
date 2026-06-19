@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import reportBg    from '../../assets/images/home/home-report-bg.png'
 import waterDrop   from '../../assets/images/home/home-water-drop.png'
 import chevronIcon from '../../assets/Icon/home-card-allow.svg'
@@ -14,7 +16,6 @@ const glass = {
   borderRadius: 12,
   flexShrink: 0,
   overflow: 'hidden',
-  /* Fill FFFFFF 25% */
   background: 'rgba(255, 255, 255, 0.25)',
   backdropFilter: 'blur(2px)',
   WebkitBackdropFilter: 'blur(10px)',
@@ -27,6 +28,13 @@ const glass = {
 }
 
 function MetricsCard({ metrics }) {
+  const [ready, setReady] = useState(false)
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   return (
     <div
       style={{
@@ -40,7 +48,6 @@ function MetricsCard({ metrics }) {
     >
       {metrics.map(({ label, score }) => (
         <div key={label} style={{ width: '100%' }}>
-          {/* alignItems: center → 라벨·숫자 세로 중앙 정렬 */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
             <span style={{ fontSize: 10, fontWeight: 400, color: '#242227', lineHeight: 1.5 }}>
               {label}
@@ -51,7 +58,12 @@ function MetricsCard({ metrics }) {
             </div>
           </div>
           <div style={{ height: 2.5, borderRadius: 99, overflow: 'hidden', background: '#FFFFFF' }}>
-            <div style={{ width: `${score}%`, height: '100%', borderRadius: 0, background: '#7445D6' }} />
+            <div style={{
+              width: ready ? `${score}%` : '0%',
+              height: '100%',
+              background: '#7445D6',
+              transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)',
+            }} />
           </div>
         </div>
       ))}
@@ -59,14 +71,26 @@ function MetricsCard({ metrics }) {
   )
 }
 
-/* 양 끝 라운딩(round), 솔리드 Primary 07 */
 function DonutChart({ score, size = 58 }) {
+  const [animated, setAnimated] = useState(0)
   const sw = 3
   const r  = size / 2 - sw / 2
   const cx = size / 2
   const cy = size / 2
   const C  = 2 * Math.PI * r
-  const progress = (score / 100) * C
+
+  useEffect(() => {
+    const target   = (score / 100) * C
+    const duration = 900
+    const start    = performance.now()
+    const easeOut  = (t) => 1 - Math.pow(1 - t, 3)
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1)
+      setAnimated(target * easeOut(t))
+      if (t < 1) requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  }, [score, C])
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -76,8 +100,8 @@ function DonutChart({ score, size = 58 }) {
         fill="none"
         stroke="#7445D6"
         strokeWidth={sw}
-        strokeLinecap="round"
-        strokeDasharray={`${progress} ${C}`}
+        strokeLinecap="butt"
+        strokeDasharray={`${animated} ${C}`}
         transform={`rotate(-90 ${cx} ${cy})`}
       />
     </svg>
@@ -85,14 +109,10 @@ function DonutChart({ score, size = 58 }) {
 }
 
 export default function SkinReportCard() {
+  const navigate  = useNavigate()
   const skinScore = 66
 
   return (
-    /*
-      position: relative → 쉐브론 absolute 배치
-      display: flex + flexDirection: column + justifyContent: space-between
-      → 인사텍스트(상단 20px) / 카드행(하단 20px) 패딩 정확히 맞춤
-    */
     <div
       style={{
         position: 'relative',
@@ -109,8 +129,8 @@ export default function SkinReportCard() {
         justifyContent: 'space-between',
       }}
     >
-      {/* 쉐브론: 12×24, 내부 패딩 20 기준 우상단에 딱 붙임 */}
       <button
+        onClick={() => navigate('/mypage/my-beauty')}
         style={{
           position: 'absolute',
           top: 20,
@@ -125,7 +145,6 @@ export default function SkinReportCard() {
         <img src={chevronIcon} alt="더보기" style={{ width: 12, height: 24, display: 'block' }} />
       </button>
 
-      {/* 인사 텍스트 — 우측 쉐브론 영역 피하도록 paddingRight */}
       <div style={{ paddingRight: 24 }}>
         <p style={{ fontSize: 18, fontWeight: 600, color: '#242227', lineHeight: 1.4, margin: 0 }}>
           김구르님, 좋은 아침이에요.
@@ -136,10 +155,8 @@ export default function SkinReportCard() {
         </p>
       </div>
 
-      {/* 3개 글래스 카드 — space-between으로 하단 패딩 20 자동 정렬 */}
       <div style={{ display: 'flex', gap: 9 }}>
 
-        {/* 물방울 카드 */}
         <div
           style={{
             ...glass,
@@ -163,7 +180,6 @@ export default function SkinReportCard() {
 
         <MetricsCard metrics={metrics} />
 
-        {/* 도넛 카드 */}
         <div
           style={{
             ...glass,

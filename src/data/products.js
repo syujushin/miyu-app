@@ -99,10 +99,30 @@ export const PRODUCT_LIST_TEXT = MIYU_PRODUCTS
   .map(p => `${p.id}. ${p.name} / ${p.price}원 / ${p.category}`)
   .join('\n')
 
-/** 이름으로 제품 조회 (부분 일치 포함) */
-export const findProductByName = (name) =>
-  MIYU_PRODUCTS.find(p =>
-    p.name === name ||
-    name.includes(p.name) ||
-    p.name.includes(name)
-  ) ?? null
+/** 이름으로 제품 조회 (부분 일치 + 핵심 키워드 매칭) */
+export const findProductByName = (name) => {
+  if (!name) return null
+  const normalized = name.trim()
+
+  // 1. 완전 일치
+  const exact = MIYU_PRODUCTS.find(p => p.name === normalized)
+  if (exact) return exact
+
+  // 2. 포함 관계
+  const partial = MIYU_PRODUCTS.find(p =>
+    normalized.includes(p.name) || p.name.includes(normalized)
+  )
+  if (partial) return partial
+
+  // 3. 핵심 단어 2개 이상 일치 (띄어쓰기로 분리)
+  const words = normalized.split(/\s+/).filter(w => w.length >= 2)
+  const scored = MIYU_PRODUCTS
+    .map(p => ({
+      p,
+      score: words.filter(w => p.name.includes(w)).length,
+    }))
+    .filter(({ score }) => score >= 2)
+    .sort((a, b) => b.score - a.score)
+
+  return scored[0]?.p ?? null
+}

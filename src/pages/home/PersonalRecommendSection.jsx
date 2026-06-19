@@ -16,6 +16,8 @@ const PRODUCTS = [
 /* 흰색 카드 358×108(허그), padding 8px 4px */
 function ProductListCard({ img, brand, name, price, tags }) {
   const [liked, setLiked] = useState(false)
+  const [pop,   setPop]   = useState(false)
+  const toggle = () => { setLiked(p => !p); setPop(true); setTimeout(() => setPop(false), 300) }
 
   return (
     <div
@@ -66,11 +68,12 @@ function ProductListCard({ img, brand, name, price, tags }) {
 
       {/* 하트 토글 */}
       <button
-        onClick={() => setLiked(!liked)}
+        onClick={toggle}
         style={{ padding: 4, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}
       >
         <img src={liked ? heartActive : heartInactive} alt="좋아요"
-          style={{ width: 24, height: 24, display: 'block' }} />
+          className={pop ? 'heart-pop' : ''}
+          style={{ width: 24, height: 24, display: 'block', transition: 'none' }} />
       </button>
     </div>
   )
