@@ -2,26 +2,27 @@ import { useRef, useState } from 'react'
 import addIcon     from '../../assets/images/home/add.svg'
 import controlIcon from '../../assets/Icon/control.svg'
 
-import img01 from '../../assets/images/product/product-toner-esnature-oasis.webp'
-import img02 from '../../assets/images/product/product-capsule-anua.png'
-import img03 from '../../assets/images/product/product-squalane-esnature.png'
-import img04 from '../../assets/images/product/product-suncream-atte.webp'
+import img01 from '../../assets/images/product/product-capsule-anua.png'
+import img02 from '../../assets/images/product/product-ampoule-vinote.png'
+import img03 from '../../assets/images/product/product-serum-esnature.png'
+import img04 from '../../assets/images/product/product-toner-toriden.png'
 
+/* ── 확정 데이터 (변경 금지) ── */
 const PRODUCTS = [
   {
     id: 1,
     img: img01,
-    name: '에스네이처',
-    detail: '아쿠아 오아시스 토너 200ml',
-    price: '24,000',
+    name: '아누아',
+    detail: '피디알엔 캡슐 100 세럼 50ml 대용량 기획',
+    price: '23,500',
     tags: ['Miyu Only', '1+1'],
   },
   {
     id: 2,
     img: img02,
-    name: '아누아',
-    detail: '피디알엔 캡슐 100 세럼 50ml',
-    price: '23,500',
+    name: '비노트',
+    detail: '물톡스 부스터 앰플 30ml',
+    price: '35,900',
     tags: ['Miyu Only', '1+1'],
   },
   {
@@ -35,10 +36,10 @@ const PRODUCTS = [
   {
     id: 4,
     img: img04,
-    name: '아떼',
-    detail: '비건 릴리프 크림 50ml',
-    price: '34,000',
-    tags: ['Miyu Only'],
+    name: '토리든',
+    detail: '다이브인 저분자 히알루론산 토너 300ml',
+    price: '7,850',
+    tags: ['Miyu Only', '1+1'],
   },
 ]
 
@@ -82,7 +83,7 @@ function ProductCard({ img, name, detail, price, tags, clickable }) {
           <p style={{ fontSize: 12, fontWeight: 600, color: '#78757D', margin: 0, lineHeight: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', flex: 1 }}>
             {name}
           </p>
-          <button style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, pointerEvents: 'auto', display: 'flex' }}>
+          <button style={{ padding: 0, background: 'none', border: 'none', cursor: clickable ? 'pointer' : 'default', flexShrink: 0, pointerEvents: clickable ? 'auto' : 'none', display: 'flex' }}>
             <img src={controlIcon} alt="더보기" style={{ width: 16, height: 16, display: 'block' }} />
           </button>
         </div>
@@ -173,7 +174,7 @@ export default function PopularProductsSection() {
           scrollbarWidth: 'none',
           paddingLeft: 16,
           paddingRight: 16,
-          cursor: isDragging ? 'grabbing' : 'grab',
+          cursor: 'default',
           userSelect: 'none',
         }}
         onMouseDown={onMouseDown}

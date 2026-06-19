@@ -436,6 +436,7 @@ export default function MiyubotPage() {
   const [messages,     setMessages]   = useState([])
   const [inputValue,   setInputValue] = useState('')
   const [isTyping,     setIsTyping]   = useState(false)
+  const isComposing = useRef(false)   // IME 한글 조합 중 여부
   const [gptHistory,   setGptHistory] = useState([])  // GPT 대화 컨텍스트
   const [gptTurnCount, setGptTurnCount] = useState(0) // GPT 응답 횟수 (1턴=첫 응답)
   const bottomRef = useRef(null)
@@ -742,7 +743,14 @@ export default function MiyubotPage() {
             className="miyubot-input"
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-            onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() } }}
+            onCompositionStart={() => { isComposing.current = true }}
+            onCompositionEnd={() => { isComposing.current = false }}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey && !isComposing.current) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
             style={{ flex: 1, border: 'none', outline: 'none', fontSize: 16, fontWeight: 400, color: '#242227', lineHeight: 1.4, backgroundColor: 'transparent', letterSpacing: '-0.01em' }}
             placeholder="원하는 고민을 입력해주세요"
           />

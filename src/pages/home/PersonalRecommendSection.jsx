@@ -4,14 +4,13 @@ import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
 import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
 
 import img07 from '../../assets/images/product/product-cream-estra.png'
-import img08 from '../../assets/images/product/product-blusher-vdl.png'
-import img09 from '../../assets/images/product/product-tint-amuse.png'
+import img08 from '../../assets/images/product/product-lip-laneige.png'
+import img09 from '../../assets/images/product/product-serum-esnature.png'
 
-/* 추후 실제 이미지로 교체 예정 */
 const PRODUCTS = [
-  { id: 1, img: img07, brand: '에스트라',  name: '아토베리어365 크림 80ml',         price: '33,000', tags: ['Miyu Only', '1+1'] },
-  { id: 2, img: img08, brand: 'VDL',       name: '치크스테인 블러셔 01 바운딩 피치', price: '12,900', tags: ['Miyu Only', '1+1'] },
-  { id: 3, img: img09, brand: '어뮤즈',    name: '듀 틴트 04 포멜로 누드',           price: '20,000', tags: ['Miyu Only', '1+1'] },
+  { id: 1, img: img07, brand: '에스트라',  name: '아토베리어365 크림 80ml',     price: '33,000', tags: ['Miyu Only', '1+1'] },
+  { id: 2, img: img08, brand: '라네즈',    name: '립 슬리핑 마스크 EX 20g',     price: '15,800', tags: ['1+1'] },
+  { id: 3, img: img09, brand: '에스네이처', name: '아쿠아 스쿠알란 세럼 50ml', price: '24,000', tags: ['Miyu Only', '1+1'] },
 ]
 
 /* 흰색 카드 358×108(허그), padding 8px 4px */

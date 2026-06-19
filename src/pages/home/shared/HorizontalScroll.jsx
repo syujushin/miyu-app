@@ -29,7 +29,7 @@ export default function HorizontalScroll({ children, paddingX = 16, gap = 8 }) {
         scrollbarWidth: 'none',
         paddingLeft: paddingX,
         paddingRight: paddingX,
-        cursor: isDragging ? 'grabbing' : 'grab',
+        cursor: 'default',
         userSelect: 'none',
       }}
       onMouseDown={onMouseDown}
