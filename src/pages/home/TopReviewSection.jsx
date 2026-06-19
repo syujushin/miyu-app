@@ -6,8 +6,11 @@ import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
 import imgPartion       from '../../assets/images/product/product-toner-partion.png'
 import imgDasiqueCheek  from '../../assets/images/product/product-cheek-dasique.png'
 import imgAnua          from '../../assets/images/product/product-capsule-anua.png'
+import imgBergamot      from '../../assets/images/product/product-innerbeauty-bergamot-collagen.jpg'
+import imgMakeon        from '../../assets/images/product/product-device-makeon.png'
 
 const CATEGORIES = ['스킨케어', '메이크업', '이너뷰티', '디바이스', '마스크팩']
+// 이너뷰티: id 3(아누아-이너뷰티분류), id 4(베르가못) / 디바이스: id 5(메이크온)
 
 /* 추후 실제 이미지 및 API 연동 예정 */
 const REVIEW_ITEMS = [
@@ -46,6 +49,30 @@ const REVIEW_ITEMS = [
     reviewText: '피부 장벽 강화에 정말 효과적이에요. 꾸준히 사용하니 예민했던 피부가 훨씬 안정되고 촉촉해졌어요. 향료 없이 순한 성분으로 민감성 피부에도 부담 없이 사용할 수 있어서 강력 추천해요.',
     date: '2025.11.12',
     author: '서유준',
+  },
+  {
+    id: 4,
+    img: imgBergamot,
+    brand: '이너뷰티',
+    name: '베르가못 콜라겐 스틱 1박스',
+    price: '32,000',
+    category: '이너뷰티',
+    rating: 5,
+    reviewText: '베르가못 향이 상큼해서 매일 챙겨 먹기 좋아요. 피부 탄력이 눈에 띄게 개선됐고 속건조가 줄어든 느낌이에요. 복합성 피부에 안성맞춤인 이너뷰티 제품이에요.',
+    date: '2025.12.01',
+    author: '피부덕후',
+  },
+  {
+    id: 5,
+    img: imgMakeon,
+    brand: '메이크온',
+    name: '메이크온 디바이스',
+    price: '89,000',
+    category: '디바이스',
+    rating: 5,
+    reviewText: '사용한 지 2주 만에 피부 탄력이 확실히 달라졌어요. LED 마스크와 함께 사용하면 시너지가 대단해요. 민감한 피부에도 자극 없이 사용할 수 있어 만족스럽습니다.',
+    date: '2025.12.05',
+    author: '뷰티러버',
   },
 ]
 

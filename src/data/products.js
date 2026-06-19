@@ -31,6 +31,18 @@ import imgBanilacoBlusher from '../assets/images/product/product-blusher-banilac
 import imgEsnatureCream from '../assets/images/product/product-cream-esnature-squalane.webp'
 import imgDasiqueEye    from '../assets/images/product/product-eyeshadow-dasique-peachsqueeze.jpg'
 
+/* 신규 10개 */
+import imgMakeon          from '../assets/images/product/product-device-makeon.png'
+import imgSchoolofhip     from '../assets/images/product/product-tint-schoolofhip-inkmoodglow-034.jpg'
+import imgBergamot        from '../assets/images/product/product-innerbeauty-bergamot-collagen.jpg'
+import imgPeripera        from '../assets/images/product/product-tint-peripera-inkmoodglow.webp'
+import imgFweeEye02       from '../assets/images/product/product-eyepalette-fwee-glass-02summer.jpg'
+import imgFweeBase        from '../assets/images/product/product-base-fwee-spaairy-uvtoneup.png'
+import imgFweeEye         from '../assets/images/product/product-eyepalette-fwee-glass.jpg'
+import imgFweeCushion     from '../assets/images/product/product-cushion-fwee-glass-original.png'
+import imgFweeSuede       from '../assets/images/product/product-tint-fwee-suede.jpg'
+import imgFweePink        from '../assets/images/product/product-tint-fwee-pinkobsession-rosebeige.png'
+
 export const MIYU_PRODUCTS = [
   /* ── 스킨케어 ── */
   { id: 1,  name: '아누아 피디알엔 캡슐',                             price: '23,500', category: '스킨케어',    img: imgAnua },
@@ -68,6 +80,18 @@ export const MIYU_PRODUCTS = [
   { id: 20, name: '정샘물 마스터클래스 글로우 베이스',                   price: '42,000', category: '메이크업',    img: imgJungsaemmool },
   { id: 27, name: '바닐라코 프라이밍 베일 치크 팩트 블러셔 멜로우니스', price: '22,000', category: '메이크업',    img: imgBanilacoBlusher },
   { id: 29, name: '데이지크 섀도우 팔레트 14 피치 스퀴즈',              price: '24,000', category: '아이섀도우',   img: imgDasiqueEye },
+
+  /* ── 신규 10개 ── */
+  { id: 30, name: '메이크온 디바이스',                                   price: '89,000', category: '디바이스',     img: imgMakeon,    tags: [] },
+  { id: 31, name: '스쿨 오브 힙 잉크 무드 글로이 틴트 034 웜핑크',      price: '16,000', category: '틴트',         img: imgSchoolofhip, tags: ['신상'] },
+  { id: 32, name: '이너뷰티 베르가못 콜라겐 스틱 1박스',                  price: '32,000', category: '이너뷰티',     img: imgBergamot,  tags: [] },
+  { id: 33, name: '페리페라 잉크 무드 글로이 틴트',                       price: '15,000', category: '틴트',         img: imgPeripera,  tags: ['신상'] },
+  { id: 34, name: '퓌 아이팔레트 글래스 5.1g 02 여름',                   price: '19,000', category: '아이섀도우',   img: imgFweeEye02, tags: [] },
+  { id: 35, name: '퓌 스파 에어리 UV 톤업 베이스',                        price: '17,000', category: '베이스',       img: imgFweeBase,  tags: [] },
+  { id: 36, name: '퓌 아이팔레트 글래스 5.1g',                           price: '19,000', category: '아이섀도우',   img: imgFweeEye,   tags: [] },
+  { id: 37, name: '퓌 쿠션 글래스 오리지널',                              price: '25,000', category: '쿠션',         img: imgFweeCushion, tags: [] },
+  { id: 38, name: '퓌 틴트 스웨이드 5g',                                  price: '14,000', category: '틴트',         img: imgFweeSuede, tags: [] },
+  { id: 39, name: '퓌 핑크 옵세션 스테이핏 틴트 로즈베이지',              price: '14,000', category: '틴트',         img: imgFweePink,  tags: [] },
 ]
 
 /** GPT 시스템 프롬프트에 주입할 제품 목록 텍스트 */

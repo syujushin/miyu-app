@@ -4,7 +4,9 @@ import HomePage       from './pages/home/HomePage'
 import MyPage         from './pages/mypage/MyPage'
 import MiyubotPage    from './pages/miyubot/MiyubotPage'
 import ComingSoonPage from './pages/common/ComingSoonPage'
-import AiDemoPage     from './pages/ai-demo/AiDemoPage'
+import AiDemoPage          from './pages/ai-demo/AiDemoPage'
+import ProductReviewPage   from './pages/product-review/ProductReviewPage'
+import ProductDetailPage   from './pages/product-detail/ProductDetailPage'
 
 export default function App() {
   return (
@@ -19,6 +21,8 @@ export default function App() {
         </Route>
         {/* AI 데모 — 별도 레이아웃 없이 독립 페이지 */}
         <Route path="ai-demo" element={<AiDemoPage />} />
+        <Route path="product-detail/:productId" element={<ProductDetailPage />} />
+        <Route path="product-review/:productId" element={<ProductReviewPage />} />
       </Routes>
     </BrowserRouter>
   )

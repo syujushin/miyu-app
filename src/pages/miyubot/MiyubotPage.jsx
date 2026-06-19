@@ -8,8 +8,10 @@ import homeIcon      from '../../assets/Icon/home-inactive.svg'
 import menuIcon      from '../../assets/Icon/ui/icon-menu.svg'
 import newChatIcon   from '../../assets/Icon/ui/Top/icon-newchat.svg'
 import chevronIcon   from '../../assets/Icon/ui/Recommend/chevron.svg'
-import cameraIcon    from '../../assets/miyubot/Bottom/miyubot-camera.svg'
-import sendIcon      from '../../assets/miyubot/Bottom/miyubot-send.svg'
+import cameraIcon     from '../../assets/Icon/miyubot-camera.svg'
+import popupCameraIcon from '../../assets/Icon/camera.svg'
+import popupPhotoIcon  from '../../assets/Icon/photo.svg'
+import sendIcon        from '../../assets/Icon/miyubot-send.svg'
 import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
 import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
 
@@ -36,7 +38,7 @@ const ROUTINE_DATA = {
       { step: 2, name: '앰플',     reason: '3종 세라마이드 복합체가 예민해진 피부 장벽을 집중적으로 회복시켜 자극을 줄여줘요',                   product: '앰플엔 세라마이드샷 앰플',             price: '14,900' },
       { step: 3, name: '세럼',     reason: '스쿠알란 성분이 건조함을 채우고 민감성 피부에 자극 없이 수분막을 형성해줘요',                         product: '에스네이처 아쿠아 스쿠알란',           price: '24,000' },
       { step: 4, name: '크림',     reason: '아토베리어 복합체가 피부 장벽을 강화하고 수분 손실을 막아 다음 날 촉촉함을 유지해줘요',               product: '에스트라 아토베리어365 크림 80ml',     price: '33,000' },
-      { step: 5, name: '수분 마스크', reason: '수면 중 피부 재생을 도우며 보습막을 형성해 건조한 아침 피부를 방지해줘요',                        product: '수면 수분 마스크팩',                   price: '(미구현)' },
+      { step: 5, name: '수분 마스크', reason: '티트리 성분이 진정 효과를 주면서 수면 중 피부를 촉촉하게 케어해 다음 날 맑은 피부를 만들어줘요', product: '메디힐 티트리 케어 솔루션 에센셜 마스크', price: '12,900' },
     ],
   },
   morning: {
@@ -45,7 +47,7 @@ const ROUTINE_DATA = {
       { step: 1, name: '토너',     reason: '가볍고 산뜻하게 흡수되며 수분 공급과 동시에 피부 결을 정돈해줘요',                                 product: '파티온 포도당 하이드로 에센스 토너 500ml', price: '29,000' },
       { step: 2, name: '세럼',     reason: '피디알엔 성분이 피부 장벽을 보호하면서 가볍게 흡수되어 속건조를 예방해줘요',                         product: '아누아 피디알엔 캡슐',                 price: '23,500' },
       { step: 3, name: '크림',     reason: '가벼운 텍스처로 피부에 자연스럽게 흡수되어 메이크업 밀착력을 높여줘요',                               product: '에스트라 아토베리어365 크림 80ml',     price: '33,000' },
-      { step: 4, name: '선크림',   reason: 'SPF 50+ 자외선 차단으로 피부 광노화를 예방하고 민감성 피부에도 자극이 적어요',                       product: '자외선 차단제',                         price: '(미구현)' },
+      { step: 4, name: '선크림',   reason: '자작나무 수분 성분이 피부 보습을 유지하면서 SPF50+/PA++++ 강력 자외선 차단으로 피부를 보호해줘요',  product: '라운드랩 자작나무 수분 선크림',          price: '15,000' },
       { step: 5, name: '베이스 마무리', reason: '피부 톤을 자연스럽게 정리하고 메이크업 지속력을 높여 외출 준비를 마무리해줘요',                  product: 'VDL 치크스테인 블러셔 01 바운딩 피치', price: '12,900' },
     ],
   },
@@ -74,7 +76,7 @@ const botCardStyle = {
   borderRadius: '0 20px 20px 20px',
   backgroundColor: '#F7F6F9',
   padding: 16,
-  marginBottom: 12,
+  marginBottom: 20,
   width: '100%',
   maxWidth: 320,
 }
@@ -132,7 +134,7 @@ function RoutineStepItem({ step, name, reason, product, price }) {
           <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.5, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{product}</p>
           <p style={{ margin: '-3px 0 0', lineHeight: 1.4 }}>
             <span style={{ fontSize: 14, fontWeight: 800, color: '#6633CC' }}>{price}</span>
-            {price !== '(미구현)' && <span style={{ fontSize: 10, color: '#242227', marginLeft: 1 }}>원</span>}
+            <span style={{ fontSize: 10, color: '#242227', marginLeft: 1 }}>원</span>
           </p>
         </div>
         <button onClick={() => setLiked(!liked)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, pointerEvents: 'auto' }}>
@@ -148,15 +150,88 @@ function RoutineResponse({ timeSlot }) {
   const data = ROUTINE_DATA[timeSlot]
   if (!data) return null
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-      {/* 인트로 텍스트 카드 */}
-      <div style={{ ...botCardStyle }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
+      {/* 인트로 텍스트 카드 — marginBottom 0으로 덮어씌워 gap만 사용 */}
+      <div style={{ ...botCardStyle, marginBottom: 0 }}>
         <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6 }}>
           {data.intro}
         </p>
       </div>
       {/* 5단계 스텝 카드 */}
       {data.steps.map(s => <RoutineStepItem key={s.step} {...s} />)}
+    </div>
+  )
+}
+
+/* ── 피부진단 결과 카드 ── */
+function SkinDiagnosisCard({ onAction }) {
+  const diagData = [
+    {
+      title: '구르님의 피부 타입',
+      chips: ['복합성 피부', '건조함', '민감성'],
+    },
+    {
+      title: '구르님의 퍼스널 컬러',
+      chips: ['봄웜라이트', '살몬코랄', '로즈베이지'],
+    },
+    {
+      title: '구르님의 사용 중인 디바이스',
+      chips: ['LG 프라엘 LED 마스크'],
+    },
+  ]
+  return (
+    <div>
+      <div style={{ ...botCardStyle, marginBottom: 0 }}>
+        <p style={{ fontSize: 15, fontWeight: 600, color: '#242227', margin: '0 0 12px', lineHeight: 1.4 }}>
+          최근 피부 진단 기록
+        </p>
+        {diagData.map((d, i) => (
+          <div key={d.title} style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 14px', marginBottom: i < diagData.length - 1 ? 8 : 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 8 }}>
+              <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, borderRadius: 6, display: 'block', flexShrink: 0 }} />
+              <p style={{ fontSize: 14, fontWeight: 600, color: '#242227', margin: 0 }}>{d.title}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+              {d.chips.map(c => <span key={c} style={skinChipStyle}>{c}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* 액션 버튼 */}
+      <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 20 }}>
+        {['피부 상태 재진단 방법', '피부 진단 기록보기'].map(label => (
+          <button
+            key={label}
+            onClick={() => onAction(label)}
+            style={{ padding: '12px 20px', borderRadius: 99, backgroundColor: '#F6F2FF', border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, color: '#6633CC', lineHeight: 1.5, letterSpacing: '-0.01em' }}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ── 재진단 방법 카드 ── */
+function DiagnosisMethodCard() {
+  const methods = [
+    { tag: '카메라로 즉시 촬영', desc: "'+' 버튼 눌러 카메라 선택, 촬영 후 고민 설명" },
+    { tag: '이미지 업로드',       desc: "'+' 버튼 눌러 이미지 선택 후 고민 설명" },
+  ]
+  return (
+    <div style={{ ...botCardStyle, marginBottom: 0 }}>
+      <p style={{ fontSize: 15, fontWeight: 600, color: '#242227', margin: '0 0 12px', lineHeight: 1.4 }}>
+        피부 상태 재진단 방법
+      </p>
+      {methods.map((m, i) => (
+        <div key={m.tag} style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 14px', marginBottom: i < methods.length - 1 ? 8 : 0 }}>
+          <span style={{ display: 'inline-block', fontSize: 12, fontWeight: 500, color: '#242227', backgroundColor: '#F6F2FF', borderRadius: 99, padding: '3px 10px', marginBottom: 8 }}>
+            {m.tag}
+          </span>
+          <p style={{ fontSize: 13, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.55 }}>{m.desc}</p>
+        </div>
+      ))}
     </div>
   )
 }
@@ -189,7 +264,7 @@ function SkincareInitCard() {
 /* ── 루틴 시간대 선택 칩 ── */
 function RoutineChips({ onSelect }) {
   return (
-    <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 20 }}>
+    <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 12 }}>
       {['아침 외출 전', '저녁 외출 후'].map(label => (
         <button
           key={label}
@@ -250,7 +325,7 @@ function BlusherProductCard({ img, name, price, reason }) {
   const [liked, setLiked] = useState(false)
   return (
     <div style={{
-      width: 320,
+      width: 280,
       borderRadius: 20,
       backgroundColor: '#F7F6F9',
       padding: 16,
@@ -356,7 +431,7 @@ function GptProductCard({ name, price, reason }) {
   const imgSrc = found?.img ?? null
 
   return (
-    <div style={{ width: 320, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
+    <div style={{ width: 280, borderRadius: 20, backgroundColor: '#F7F6F9', padding: 16, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
       {/* 흰색 제품 영역 */}
       <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '12px 12px', height: 69, boxSizing: 'border-box', display: 'flex', alignItems: 'center', gap: 12 }}>
         {imgSrc
@@ -397,7 +472,7 @@ function GptProductScroll({ products }) {
   const onMouseMove = (e) => { if (!isDragging.current) return; scrollRef.current.scrollLeft = scrollLeft.current - (e.pageX - scrollRef.current.offsetLeft - startX.current) }
   const onMouseUp   = () => { isDragging.current = false }
   return (
-    <div ref={scrollRef} className="category-scroll" style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 12, cursor: 'grab', userSelect: 'none' }}
+    <div ref={scrollRef} className="category-scroll" style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 20, cursor: 'grab', userSelect: 'none' }}
       onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
       <div style={{ display: 'flex', gap: 8, width: 'max-content' }}>
         {products.map((p, i) => <GptProductCard key={i} {...p} />)}
@@ -410,7 +485,7 @@ function GptProductScroll({ products }) {
 function SuggestionChips({ items, onChipClick }) {
   const CORAL_ITEM = '코랄빛이 살짝 도는 로즈베이지색의 틴트 제품 추천해줘'
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12, marginBottom: 20 }}>
       {items.map((item, i) => (
         <button key={i}
           onClick={() => onChipClick(item)}
@@ -437,6 +512,7 @@ export default function MiyubotPage() {
   const [inputValue,   setInputValue] = useState('')
   const [isTyping,     setIsTyping]   = useState(false)
   const isComposing = useRef(false)   // IME 한글 조합 중 여부
+  const [showCameraMenu, setShowCameraMenu] = useState(false)
   const [gptHistory,   setGptHistory] = useState([])  // GPT 대화 컨텍스트
   const [gptTurnCount, setGptTurnCount] = useState(0) // GPT 응답 횟수 (1턴=첫 응답)
   const bottomRef = useRef(null)
@@ -451,6 +527,15 @@ export default function MiyubotPage() {
     setInputValue('')
     setIsTyping(false)
     setGptTurnCount(0)
+  }
+
+  const handleDiagnosisAction = (label) => {
+    if (label === '피부 상태 재진단 방법') {
+      setMessages(prev => [...prev, { type: 'user', text: label }, { type: 'bot-diagnosis-method' }])
+    } else {
+      // TODO: 피부 진단 기록보기 연동 예정
+      console.log('피부 진단 기록보기')
+    }
   }
 
   const handleRoutineSelect = (label) => {
@@ -480,10 +565,41 @@ export default function MiyubotPage() {
         { type: 'bot-makeup' },
         { type: 'chips', items: SUGGESTION_CHIPS },
       ])
+    } else if (key === 'innerbeauty' || key === 'device') {
+      // 이너뷰티·디바이스 → GPT API 자연어 연결
+      const labelMap = { innerbeauty: '이너뷰티', device: '디바이스' }
+      const label = labelMap[key]
+      const userMsg = { role: 'user', content: label }
+      const nextHistory = [...gptHistory, userMsg]
+      setGptHistory(nextHistory)
+      setMessages(prev => [...prev, { type: 'user', text: label }])
+      setIsTyping(true)
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextHistory }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          const raw = data.response
+          setGptHistory(p => [...p, { role: 'assistant', content: raw }])
+          const strip = t => (t ?? '').replace(/\*\*/g, '').trim()
+          let msgText = strip(raw), products = [], showOptions = false, showRoutineChips = false
+          try {
+            const j = JSON.parse(raw)
+            msgText = strip(j.message ?? raw)
+            products = j.recommended_products ?? []
+            showOptions = j.show_options === true
+            const newTurn = gptTurnCount + 1
+            setGptTurnCount(newTurn)
+            showRoutineChips = newTurn >= 2 ? j.show_routine_chips === true : false
+          } catch {}
+          setMessages(p => [...p, { type: 'bot-gpt', text: msgText, products, showOptions, showRoutineChips }])
+        })
+        .catch(() => setMessages(p => [...p, { type: 'bot-error' }]))
+        .finally(() => setIsTyping(false))
     } else if (key === 'diagnosis') {
-      console.log('피부진단 시나리오 시작') // TODO
-    } else {
-      console.log(`${key} 카테고리 선택됨`) // TODO
+      setMessages(prev => [...prev, { type: 'user', text: '피부진단' }, { type: 'bot-skin-diagnosis' }])
     }
   }
 
@@ -496,7 +612,36 @@ export default function MiyubotPage() {
         { type: 'bot-blusher-products' },
       ])
     } else {
-      console.log('suggestion:', text) // TODO: 다음 단계 대화 연결 예정
+      // 나머지 칩 → GPT API 자연어 연결
+      const userMsg = { role: 'user', content: text }
+      const nextHistory = [...gptHistory, userMsg]
+      setGptHistory(nextHistory)
+      setMessages(prev => [...prev, { type: 'user', text }])
+      setIsTyping(true)
+      fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextHistory }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          const raw = data.response
+          setGptHistory(p => [...p, { role: 'assistant', content: raw }])
+          const strip = t => (t ?? '').replace(/\*\*/g, '').trim()
+          let msgText = strip(raw), products = [], showOptions = false, showRoutineChips = false
+          try {
+            const j = JSON.parse(raw)
+            msgText = strip(j.message ?? raw)
+            products = j.recommended_products ?? []
+            showOptions = j.show_options === true
+            const newTurn = gptTurnCount + 1
+            setGptTurnCount(newTurn)
+            showRoutineChips = newTurn >= 2 ? j.show_routine_chips === true : false
+          } catch {}
+          setMessages(p => [...p, { type: 'bot-gpt', text: msgText, products, showOptions, showRoutineChips }])
+        })
+        .catch(() => setMessages(p => [...p, { type: 'bot-error' }]))
+        .finally(() => setIsTyping(false))
     }
   }
 
@@ -565,7 +710,9 @@ export default function MiyubotPage() {
   const renderMessage = (msg, idx) => {
     switch (msg.type) {
       case 'user':               return <UserBubble key={idx} text={msg.text} />
-      case 'bot-skincare':       return <SkincareInitCard key={idx} />
+      case 'bot-skincare':        return <SkincareInitCard key={idx} />
+      case 'bot-skin-diagnosis':  return <SkinDiagnosisCard key={idx} onAction={handleDiagnosisAction} />
+      case 'bot-diagnosis-method': return <DiagnosisMethodCard key={idx} />
       case 'bot-routine':        return <RoutineResponse key={idx} timeSlot={msg.timeSlot} />
       case 'bot-makeup':         return <MakeupBotCard key={idx} />
       case 'chips':              return <SuggestionChips key={idx} items={msg.items} onChipClick={handleSuggestion} />
@@ -586,7 +733,7 @@ export default function MiyubotPage() {
               }} />
             )}
             {msg.showOptions && !msg.products?.length && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 12, marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 12 }}>
                 {['제품 추천', '루틴 추천'].map(label => (
                   <button
                     key={label}
@@ -723,7 +870,7 @@ export default function MiyubotPage() {
 
         {/* GPT 응답 로딩 인디케이터 */}
         {isTyping && (
-          <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 12, display: 'inline-block' }}>
+          <div style={{ borderRadius: '0 20px 20px 20px', backgroundColor: '#F7F6F9', padding: 16, marginBottom: 20, display: 'inline-block' }}>
             <p style={{ fontSize: 15, fontWeight: 400, color: '#9D9AA3', margin: 0, lineHeight: 1.5, whiteSpace: 'nowrap' }}>
               미유가 답변을 작성 중입니다...
             </p>
@@ -733,10 +880,65 @@ export default function MiyubotPage() {
         <div ref={bottomRef} />
       </div>
 
+      {/* ── 카메라 팝업 ── */}
+      {showCameraMenu && (
+        <>
+          {/* 배경 오버레이 */}
+          <div
+            onClick={() => setShowCameraMenu(false)}
+            style={{ position: 'absolute', inset: 0, zIndex: 40 }}
+          />
+          {/* 팝업 카드 */}
+          <div style={{
+            position: 'absolute',
+            bottom: 92,
+            left: 20,
+            zIndex: 50,
+            backgroundColor: '#FFFFFF',
+            borderRadius: 16,
+            overflow: 'hidden',
+            boxShadow: '0 4px 20px rgba(36,34,39,0.14)',
+            minWidth: 180,
+          }}>
+            {[
+              { label: '사진 촬영',    icon: popupCameraIcon },
+              { label: '보관함에서 선택', icon: popupPhotoIcon },
+            ].map(({ label, icon }, i) => (
+              <button
+                key={label}
+                onClick={() => { setShowCameraMenu(false); console.log(label) /* TODO */ }}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '14px 18px',
+                  background: 'none',
+                  border: 'none',
+                  borderTop: i > 0 ? '1px solid #F0EFF3' : 'none',
+                  cursor: 'pointer',
+                  fontSize: 15,
+                  fontWeight: 500,
+                  color: '#242227',
+                  letterSpacing: '-0.01em',
+                  textAlign: 'left',
+                }}
+              >
+                <img src={icon} alt={label} style={{ width: 22, height: 22, display: 'block', flexShrink: 0 }} />
+                {label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* ── 입력창 ── */}
       <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#FFFFFF', paddingLeft: 20, paddingRight: 20, paddingTop: 8, paddingBottom: 20, zIndex: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, backgroundColor: '#F7F6F9', borderRadius: 99, width: 350, height: 60, padding: '16px 20px', boxSizing: 'border-box' }}>
-          <button style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, display: 'flex' }}>
+          <button
+            onClick={() => setShowCameraMenu(prev => !prev)}
+            style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, display: 'flex' }}
+          >
             <img src={cameraIcon} alt="카메라" style={{ width: 28, height: 28, display: 'block' }} />
           </button>
           <input
@@ -757,7 +959,7 @@ export default function MiyubotPage() {
           <button
             onClick={handleSend}
             disabled={isTyping || !inputValue.trim()}
-            style={{ background: 'none', border: 'none', cursor: isTyping || !inputValue.trim() ? 'default' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, opacity: isTyping || !inputValue.trim() ? 0.4 : 1, transition: 'opacity 0.15s' }}
+            style={{ background: 'none', border: 'none', cursor: isTyping || !inputValue.trim() ? 'default' : 'pointer', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, opacity: 1 }}
           >
             <img src={sendIcon} alt="전송" style={{ width: 28, height: 28, display: 'block' }} />
           </button>

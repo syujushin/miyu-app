@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import addIcon     from '../../assets/images/home/add.svg'
 import controlIcon from '../../assets/Icon/control.svg'
 
@@ -43,9 +44,11 @@ const PRODUCTS = [
   },
 ]
 
-function ProductCard({ img, name, detail, price, tags, clickable }) {
+function ProductCard({ img, name, detail, price, tags, clickable, productId }) {
+  const navigate = useNavigate()
   return (
     <div
+      onClick={() => clickable && navigate(`/product-detail/${productId || name}`)}
       style={{
         width: 120,
         borderRadius: 12,
@@ -184,7 +187,7 @@ export default function PopularProductsSection() {
       >
         <div style={{ display: 'flex', gap: 8, width: 'max-content' }}>
           {PRODUCTS.map((p) => (
-            <ProductCard key={p.id} {...p} clickable={p.name === '비노트'} />
+            <ProductCard key={p.id} {...p} clickable={p.name === '비노트'} productId="vinote" />
           ))}
         </div>
       </div>
