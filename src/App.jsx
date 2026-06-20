@@ -10,6 +10,7 @@ import ComingSoonPage from './pages/common/ComingSoonPage'
 import AiDemoPage          from './pages/ai-demo/AiDemoPage'
 import ProductReviewPage   from './pages/product-review/ProductReviewPage'
 import ProductDetailPage   from './pages/product-detail/ProductDetailPage'
+import CameraPage          from './pages/camera/CameraPage'
 
 export default function App() {
   return (
@@ -25,8 +26,9 @@ export default function App() {
           <Route path="mypage/my-beauty"  element={<MyBeautyPage />} />
           <Route path="mypage/skin-data" element={<SkinDataPage />} />
         </Route>
-        {/* AI 데모 — 별도 레이아웃 없이 독립 페이지 */}
+        {/* 독립 전체화면 페이지 (AppLayout 없음) */}
         <Route path="ai-demo" element={<AiDemoPage />} />
+        <Route path="camera"  element={<CameraPage />} />
         <Route path="product-detail/:productId" element={<ProductDetailPage />} />
         <Route path="product-review/:productId" element={<ProductReviewPage />} />
       </Routes>

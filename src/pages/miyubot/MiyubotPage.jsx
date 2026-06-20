@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { MetricsCard } from '../home/SkinReportCard'
 
 import statusBarSvg  from '../../assets/Top/Status Bar.svg'
 import logoSvg       from '../../assets/logo/Top/Logo.svg'
@@ -9,9 +10,12 @@ import menuIcon      from '../../assets/Icon/ui/icon-menu.svg'
 import newChatIcon   from '../../assets/Icon/ui/Top/icon-newchat.svg'
 import chevronIcon   from '../../assets/Icon/ui/Recommend/chevron.svg'
 import cameraIcon     from '../../assets/Icon/miyubot-camera.svg'
-import popupCameraIcon from '../../assets/Icon/camera.svg'
-import popupPhotoIcon  from '../../assets/Icon/photo.svg'
 import sendIcon        from '../../assets/Icon/miyubot-send.svg'
+import closeIcon           from '../../assets/Icon/ui/icon-close.svg'
+import camPhotoIcon        from '../../assets/Icon/camera-photo.svg'
+import camCenterIcon       from '../../assets/Icon/camera-center.svg'
+import camArrowSyncIcon    from '../../assets/Icon/camera-arrow-sync.svg'
+import camCloseIcon        from '../../assets/Icon/camera-close.svg'
 import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
 import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
 
@@ -71,7 +75,7 @@ function ProductImg({ src, name, size = 44 }) {
   const [err, setErr] = useState(false)
   if (!src || err) {
     return (
-      <div style={{ width: size, height: size, borderRadius: 8, backgroundColor: '#F0E9FF', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: size, height: size, borderRadius: 8, backgroundColor: '#ECE0FE', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <img src={logoIcon} alt="" style={{ width: Math.round(size * 0.55), height: Math.round(size * 0.55), borderRadius: 4, display: 'block' }} />
       </div>
     )
@@ -86,7 +90,7 @@ function ProductImg({ src, name, size = 44 }) {
 const skinChipStyle = {
   fontSize: 12, fontWeight: 400, color: '#242227',
   backgroundColor: '#F6F2FF', borderRadius: 8,
-  padding: '3px 8px', lineHeight: 1.5, whiteSpace: 'nowrap',
+  padding: '3px 6px', lineHeight: 1.5, whiteSpace: 'nowrap',
 }
 const botCardStyle = {
   borderRadius: '0 20px 20px 20px',
@@ -293,7 +297,7 @@ function SkincareInitCard() {
 /* ── 루틴 시간대 선택 칩 ── */
 function RoutineChips({ onSelect }) {
   return (
-    <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 12 }}>
+    <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 0 }}>
       {['아침 외출 전', '저녁 외출 후'].map(label => (
         <button
           key={label}
@@ -310,7 +314,7 @@ function RoutineChips({ onSelect }) {
 /* ── 메이크업 봇 카드 (퍼스널 컬러) ── */
 function MakeupBotCard() {
   return (
-    <div style={{ ...botCardStyle, marginBottom: 20 }}>
+    <div style={{ ...botCardStyle, marginBottom: 12 }}>
       <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 12px', lineHeight: 1.5 }}>
         구르님의 퍼스널을 기반으로 추천해드릴게요.
       </p>
@@ -338,7 +342,7 @@ function MakeupBotCard() {
 /* ── 블러셔 봇 텍스트 카드 ── */
 function BlusherTextCard() {
   return (
-    <div style={{ ...botCardStyle, marginBottom: 20 }}>
+    <div style={{ ...botCardStyle, marginBottom: 12 }}>
       <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: '0 0 14px', lineHeight: 1.6 }}>
         구르님은 따뜻하고 화사한 21호 봄 웜톤이에요. 피부 톤에 자연스럽게 녹아드는 코랄과 피치 베이지 블러셔가 가장 잘 어울려요.
       </p>
@@ -492,7 +496,7 @@ function GptProductScroll({ products }) {
   const onMouseMove = (e) => { if (!isDragging.current) return; scrollRef.current.scrollLeft = scrollLeft.current - (e.pageX - scrollRef.current.offsetLeft - startX.current) }
   const onMouseUp   = () => { isDragging.current = false }
   return (
-    <div ref={scrollRef} className="category-scroll" style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 20, cursor: 'grab', userSelect: 'none' }}
+    <div ref={scrollRef} className="category-scroll" style={{ overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', marginBottom: 0, cursor: 'grab', userSelect: 'none' }}
       onMouseDown={onMouseDown} onMouseMove={onMouseMove} onMouseUp={onMouseUp} onMouseLeave={onMouseUp}>
       <div style={{ display: 'flex', gap: 8, width: 'max-content' }}>
         {products.map((p, i) => <GptProductCard key={i} {...p} />)}
@@ -525,6 +529,435 @@ function SuggestionChips({ items, onChipClick }) {
   )
 }
 
+/* ── 카메라 얼굴 메쉬 SVG ── */
+// 전체화면 기준 (390×844)
+const CAM_VB_W = 390, CAM_VB_H = 844
+// 얼굴 타원 — 박스 중심에 맞춤
+const CAM_CX = 195, CAM_CY = 340, CAM_RX = 132, CAM_RY = 180
+// 코너 브라켓 박스 — 300×400, 최상단으로부터 140
+const BOX_L = 45, BOX_R = 345, BOX_T = 140, BOX_B = 540
+
+function CamFaceMesh({ scanProgress }) {
+  const scanning = scanProgress !== null
+  const scanY = scanning ? BOX_T + (scanProgress / 100) * (BOX_B - BOX_T) : null
+
+  // 얼굴 윤곽 삼각형 메쉬 — 전체화면(844) 기준, 얼굴 타원 중심 (195, 340)
+  const rows = [
+    [[168,178],[195,172],[222,178]],
+    [[140,197],[168,188],[195,185],[222,188],[250,197]],
+    [[108,223],[138,212],[167,206],[195,204],[223,206],[252,212],[282,223]],
+    [[102,247],[134,237],[164,232],[195,230],[226,232],[256,237],[288,247]],
+    [[97,279],[128,271],[157,267],[177,263],[195,262],[213,263],[233,267],[262,271],[293,279]],
+    [[97,314],[127,307],[156,303],[176,299],[195,302],[214,299],[234,303],[263,307],[293,314]],
+    [[102,349],[131,343],[158,339],[178,337],[195,339],[212,337],[232,339],[259,343],[288,349]],
+    [[114,384],[141,381],[165,377],[195,376],[225,377],[249,381],[276,384]],
+    [[132,412],[161,410],[195,411],[229,410],[258,412]],
+    [[158,435],[195,442],[232,435]],
+  ]
+
+  // 삼각형 엣지 생성 (행 내 수평 + 인접 행 간 사선)
+  const segs = []
+  for (let r = 0; r < rows.length; r++) {
+    const row = rows[r]
+    for (let i = 0; i < row.length - 1; i++) segs.push([row[i], row[i + 1]])
+    if (r < rows.length - 1) {
+      const nxt = rows[r + 1]
+      for (let i = 0; i < row.length; i++) {
+        const ni = Math.round((i * (nxt.length - 1)) / Math.max(1, row.length - 1))
+        segs.push([row[i], nxt[ni]])
+        if (ni + 1 < nxt.length) segs.push([row[i], nxt[ni + 1]])
+      }
+    }
+  }
+  const pts = rows.flat()
+
+  // 얼굴 실루엣 윤곽 — 각 행 최외곽 점을 시계방향으로 연결
+  const faceOutlinePts = [
+    [195,172],
+    [222,178],[250,197],[282,223],[288,247],[293,279],[293,314],[288,349],[276,384],[258,412],[232,435],[195,442],
+    [158,435],[132,412],[114,384],[102,349],[97,314],[97,279],[102,247],[108,223],[140,197],[168,178],
+    [195,172],
+  ].map(([x, y]) => `${x},${y}`).join(' ')
+
+  return (
+    <svg
+      viewBox={`0 0 ${CAM_VB_W} ${CAM_VB_H}`}
+      preserveAspectRatio="xMidYMid slice"
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+    >
+      <defs>
+        <linearGradient id="cam-scan-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor="#A17CF0" stopOpacity="0" />
+          <stop offset="50%"  stopColor="#7733FF" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#A17CF0" stopOpacity="0" />
+        </linearGradient>
+        <radialGradient id="mesh-inner-glow" cx="50%" cy="42%" r="55%">
+          <stop offset="0%"   stopColor="#C0A3F7" stopOpacity="0.22" />
+          <stop offset="60%"  stopColor="#8257E0" stopOpacity="0.10" />
+          <stop offset="100%" stopColor="#6633CC" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* 메쉬 + 얼굴 실루엣 — 126% 스케일, 하단을 BOX_B(540)에 정렬 */}
+      {/* 메쉬 중심(195,307) 기준 1.26배 → 하단 y=307+135*1.26≈477 → cy=370으로 이동하면 하단=540 */}
+      <g transform="translate(195,370) scale(1.26) translate(-195,-307)" opacity={scanning ? 1 : 0.8}>
+        {/* 은근한 연보라 내부 광택 */}
+        <polygon
+          points={faceOutlinePts}
+          fill="url(#mesh-inner-glow)"
+        />
+        <polyline
+          points={faceOutlinePts}
+          fill="none"
+          stroke="#ECE0FE"
+          strokeWidth="0.71"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+        />
+        {segs.map(([a, b], i) => (
+          <line key={'l' + i} x1={a[0]} y1={a[1]} x2={b[0]} y2={b[1]}
+            stroke="#ECE0FE" strokeWidth="0.32" strokeOpacity="0.8" />
+        ))}
+        {pts.map(([x, y], i) => (
+          <circle key={'p' + i} cx={x} cy={y} r="0.87" fill="#ECE0FE" fillOpacity="0.9" />
+        ))}
+      </g>
+
+      {/* 코너 브라켓 — 300×400 박스, y=140 기준 */}
+      <g stroke="#ECE0FE" strokeWidth="1.5" fill="none" strokeLinecap="round">
+        <path d={`M ${BOX_L + 30} ${BOX_T} L ${BOX_L} ${BOX_T} L ${BOX_L} ${BOX_T + 30}`} />
+        <path d={`M ${BOX_R - 30} ${BOX_T} L ${BOX_R} ${BOX_T} L ${BOX_R} ${BOX_T + 30}`} />
+        <path d={`M ${BOX_L + 30} ${BOX_B} L ${BOX_L} ${BOX_B} L ${BOX_L} ${BOX_B - 30}`} />
+        <path d={`M ${BOX_R - 30} ${BOX_B} L ${BOX_R} ${BOX_B} L ${BOX_R} ${BOX_B - 30}`} />
+      </g>
+
+      {/* 스캔 라인 */}
+      {scanY !== null && (
+        <>
+          <rect x="0" y={scanY - 10} width={CAM_VB_W} height={20} fill="url(#cam-scan-grad)" />
+          <line x1="0" y1={scanY} x2={CAM_VB_W} y2={scanY}
+            stroke="#B08FF4" strokeWidth="1.5" opacity="0.9" />
+        </>
+      )}
+    </svg>
+  )
+}
+
+/* ── 카메라 오버레이 (구 CameraPage 디자인) ── */
+function CameraOverlay({ onCapture, onClose }) {
+  const videoRef  = useRef(null)
+  const canvasRef = useRef(null)
+  const streamRef = useRef(null)
+  const rafRef    = useRef(null)
+  const [phase,        setPhase]        = useState('init')
+  const [scanProgress, setScanProgress] = useState(null)
+
+  useEffect(() => {
+    let mounted = true
+    if (!navigator.mediaDevices?.getUserMedia) { setPhase('error'); return }
+    navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: 'user', width: { ideal: 390 } } })
+      .then(stream => {
+        if (!mounted) { stream.getTracks().forEach(t => t.stop()); return }
+        streamRef.current = stream
+        if (videoRef.current) videoRef.current.srcObject = stream
+        setPhase('camera')
+      })
+      .catch(() => { if (mounted) setPhase('error') })
+    return () => {
+      mounted = false
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  const handleShutter = () => {
+    if (phase !== 'camera') return
+    setPhase('scanning')
+    setScanProgress(0)
+    const DURATION = 2500
+    const start = performance.now()
+    const tick = (now) => {
+      const p = Math.min(((now - start) / DURATION) * 100, 100)
+      setScanProgress(p)
+      if (p < 100) { rafRef.current = requestAnimationFrame(tick) }
+      else { captureAndClose() }
+    }
+    rafRef.current = requestAnimationFrame(tick)
+  }
+
+  const captureAndClose = () => {
+    const video  = videoRef.current
+    const canvas = canvasRef.current
+    let dataUrl = null
+    if (video && canvas) {
+      canvas.width  = video.videoWidth  || 390
+      canvas.height = video.videoHeight || 584
+      const ctx = canvas.getContext('2d')
+      ctx.translate(canvas.width, 0)
+      ctx.scale(-1, 1)
+      ctx.drawImage(video, 0, 0)
+      dataUrl = canvas.toDataURL('image/jpeg', 0.88)
+    }
+    streamRef.current?.getTracks().forEach(t => t.stop())
+    setScanProgress(null)
+    onCapture(dataUrl)
+  }
+
+  /* 에러 화면 */
+  if (phase === 'error') {
+    return (
+      <div style={{ position: 'absolute', inset: 0, zIndex: 100, display: 'flex', flexDirection: 'column', background: 'linear-gradient(160deg, #20004D 0%, #3A0090 50%, #6633CC 100%)' }}>
+        <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block', flexShrink: 0, filter: 'invert(1)' }} />
+        <div style={{ height: 52, display: 'flex', alignItems: 'center', paddingLeft: 16, paddingRight: 16, flexShrink: 0 }}>
+          <button onClick={onClose} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <img src={closeIcon} alt="닫기" style={{ width: 28, height: 28, display: 'block', filter: 'brightness(0) invert(1)' }} />
+          </button>
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 32px', gap: 16 }}>
+          <div style={{ width: 88, height: 88, borderRadius: 28, background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none">
+              <path d="M23 19C23 20.1 22.1 21 21 21H3C1.9 21 1 20.1 1 19V8C1 6.9 1.9 6 3 6H7L9 4H15L17 6H21C22.1 6 23 6.9 23 8V19Z" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" strokeLinejoin="round" />
+              <circle cx="12" cy="13" r="4" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" />
+              <line x1="3" y1="3" x2="21" y2="21" stroke="#EF4444" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+          <p style={{ fontSize: 20, fontWeight: 600, color: '#FFFFFF', textAlign: 'center', lineHeight: 1.4 }}>카메라 접근이 필요해요</p>
+          <p style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.6)', textAlign: 'center', lineHeight: 1.7 }}>
+            AI 피부 분석을 위해 카메라 권한이<br />필요해요. 브라우저 설정에서<br />카메라 접근을 허용해주세요.
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', marginTop: 16 }}>
+            <button onClick={onClose} style={{ height: 54, borderRadius: 16, background: 'linear-gradient(135deg, #7733FF, #B08FF4)', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 16, fontWeight: 600, letterSpacing: '-0.01em', boxShadow: '0 8px 24px rgba(119,51,255,0.38)' }}>
+              닫기
+            </button>
+            <button onClick={() => window.location.reload()} style={{ height: 54, borderRadius: 16, background: 'rgba(255,255,255,0.10)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.18)', cursor: 'pointer', color: '#FFFFFF', fontSize: 16, fontWeight: 500, letterSpacing: '-0.01em' }}>
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  /* 카메라 / 스캔 화면 — 비디오 전체화면 + floating UI */
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 100, background: '#000000', overflow: 'hidden' }}>
+
+      {/* 전체화면 비디오 */}
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', transform: 'scaleX(-1)' }}
+      />
+
+      {/* 카메라 준비 중 */}
+      {phase === 'init' && (
+        <div style={{ position: 'absolute', inset: 0, background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span className="dot-1" style={{ background: '#9169EB' }} />
+              <span className="dot-2" style={{ background: '#9169EB' }} />
+              <span className="dot-3" style={{ background: '#9169EB' }} />
+            </div>
+            <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: 14 }}>카메라 준비 중...</p>
+          </div>
+        </div>
+      )}
+
+      {/* 얼굴 메쉬 오버레이 */}
+      {(phase === 'camera' || phase === 'scanning') && <CamFaceMesh scanProgress={scanProgress} />}
+
+      {/* 상단 그라디언트 + 헤더 (floating) */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
+        background: 'linear-gradient(to bottom, rgba(0,0,0,0.65) 0%, transparent 100%)',
+        paddingBottom: 36,
+      }}>
+        <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block', filter: 'invert(1)' }} />
+        <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingLeft: 16, paddingRight: 16 }}>
+          <p style={{ fontSize: 17, fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
+            {phase === 'scanning' ? 'AI 분석 중' : '피부 스캔'}
+          </p>
+        </div>
+      </div>
+
+      {/* 닫기 버튼 — 최상단으로부터 67px */}
+      <button
+        onClick={onClose}
+        style={{ position: 'absolute', top: 67, left: 16, padding: 0, background: 'none', border: 'none', cursor: 'pointer', zIndex: 20 }}
+      >
+        <img src={camCloseIcon} alt="닫기" style={{ width: 32, height: 32, display: 'block', filter: 'brightness(0) invert(1)' }} />
+      </button>
+
+      {/* 스캔 진행률 뱃지 */}
+      {phase === 'scanning' && (
+        <div style={{ position: 'absolute', top: 110, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 99, padding: '7px 18px', border: '1px solid rgba(161,124,240,0.4)', whiteSpace: 'nowrap', zIndex: 10 }}>
+          <span style={{ color: '#B08FF4', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>
+            스캔 중... {Math.round(scanProgress ?? 0)}%
+          </span>
+        </div>
+      )}
+
+      {/* 하단 컨트롤 (floating) */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
+        paddingBottom: 52, paddingTop: 36,
+        background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
+      }}>
+        {phase === 'scanning' ? (
+          <div style={{ paddingLeft: 36, paddingRight: 36 }}>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, textAlign: 'center', marginBottom: 14 }}>얼굴을 움직이지 말고 기다려주세요</p>
+            <div style={{ height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+              <div style={{ width: `${scanProgress ?? 0}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #7733FF, #A17CF0)', transition: 'width 0.05s linear' }} />
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+            <p style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.62)', letterSpacing: '-0.01em' }}>얼굴을 타원 안에 맞춰주세요</p>
+            {/* 3버튼 오토레이아웃 gap=50 */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 50 }}>
+              {/* 왼쪽: camera-photo.svg, 흰색 원 56px */}
+              <button style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.95)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src={camPhotoIcon} alt="갤러리" style={{ width: 24, height: 24, display: 'block' }} />
+              </button>
+              {/* 가운데: camera-center.svg, 72px */}
+              <button
+                onClick={handleShutter}
+                disabled={phase !== 'camera'}
+                aria-label="피부 스캔 시작"
+                style={{ width: 72, height: 72, padding: 0, background: 'none', border: 'none', cursor: phase === 'camera' ? 'pointer' : 'default', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: phase === 'camera' ? 1 : 0.5 }}
+              >
+                <img src={camCenterIcon} alt="촬영" style={{ width: 72, height: 72, display: 'block' }} />
+              </button>
+              {/* 오른쪽: camera-arrow-sync.svg, 흰색 원 56px */}
+              <button style={{ width: 56, height: 56, borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.95)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <img src={camArrowSyncIcon} alt="카메라 전환" style={{ width: 24, height: 24, display: 'block' }} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
+    </div>
+  )
+}
+
+/* ── 사용자 사진 말풍선 ── */
+function UserPhotoBubble({ dataUrl }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
+      <img
+        src={dataUrl}
+        alt="촬영한 사진"
+        style={{ maxWidth: '68%', maxHeight: 200, borderRadius: '16px 0 16px 16px', objectFit: 'cover', display: 'block' }}
+      />
+    </div>
+  )
+}
+
+/* ── 피부 진단 결과 카드 (카메라 촬영 후 채팅 내 표시) ── */
+function SkinResultCard({ skinData }) {
+  const SCORE      = skinData?.score      ?? 72
+  const SKIN_TYPE  = skinData?.skin_type  ?? '수분 부족형 복합성 민감 피부'
+  const TAGS       = skinData?.tags       ?? ['유수분 불균형', '속건조', '민감 반응']
+  const COMMENT    = skinData?.comment    ?? "현재 T존의 과다 유분과 U존의 건조함이 동시에\n관찰되며, 자가 진단 대로 '수부지' 성향이 강합니다."
+  const ANALYSIS   = skinData?.analysis   ?? [
+    '구르님의 경우, 낮은 음수량과 부족한 수면 습관이 피부 장벽 기능 약화와 속건조를 심화시켜 민감도를 높이는 핵심 원인으로 분석됩니다.',
+    '하루 8잔 이상의 물 섭취와 7시간 이상의 충분한 수면으로 피부 재생력을 높이고, T존과 U존을 분리한 맞춤 케어를 실천하세요.',
+  ]
+  const metrics    = [
+    { label: '수분량', value: skinData?.moisture   ?? 45 },
+    { label: '유분량', value: skinData?.sebum       ?? 56 },
+    { label: '탄력',   value: skinData?.elasticity  ?? 72 },
+  ]
+
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  const size = 56, sw = 4, r = size / 2 - sw / 2, C = 2 * Math.PI * r
+  const dash = ready ? (SCORE / 100) * C : 0
+
+  return (
+    <div style={{ ...botCardStyle, marginBottom: 0 }}>
+      {/* 헤더 */}
+      <div style={{ marginBottom: 14 }}>
+        <span style={{ fontSize: 15, fontWeight: 600, color: '#242227' }}>피부 진단 결과</span>
+      </div>
+
+      {/* 피부 타입 + 원형 게이지 */}
+      <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: 12, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <p style={{ fontSize: 16, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.5 }}>{SKIN_TYPE}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            {TAGS.map(tag => (
+              <span key={tag} style={skinChipStyle}>{tag}</span>
+            ))}
+          </div>
+        </div>
+        <div style={{ position: 'relative', flexShrink: 0, width: size, height: size }}>
+          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+            <defs>
+              <linearGradient id="donutGauge" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#7733FF" />
+                <stop offset="100%" stopColor="#BB99FF" />
+              </linearGradient>
+            </defs>
+            <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#F0EFF3" strokeWidth={sw} />
+            <circle
+              cx={size/2} cy={size/2} r={r}
+              fill="none"
+              stroke="url(#donutGauge)"
+              strokeWidth={sw}
+              strokeDasharray={`${dash} ${C}`}
+              transform={`rotate(-90 ${size/2} ${size/2})`}
+              style={{ transition: 'stroke-dasharray 1s cubic-bezier(0.22, 1, 0.36, 1)' }}
+            />
+          </svg>
+          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: '#6633CC', lineHeight: 1 }}>{SCORE}</span>
+              <span style={{ fontSize: 12, fontWeight: 400, color: '#242227' }}>점</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 지표 바 — 홈 화면 MetricsCard 컴포넌트 재사용 */}
+      <MetricsCard
+        metrics={metrics.map(({ label, value }) => ({ label, score: value }))}
+        trackColor="#F0EFF3"
+        barColor="linear-gradient(90deg, #BB99FF, #7733FF)"
+        labelSize={12}
+        scoreSize={12}
+        barHeight={4}
+        rowGap={4}
+        containerStyle={{
+          width: '100%', height: 'auto', flexShrink: 'unset',
+          background: '#FFFFFF', backdropFilter: 'none', WebkitBackdropFilter: 'none',
+          border: 'none', boxShadow: 'none',
+          borderRadius: 12, padding: 12, gap: 12, marginBottom: 10,
+        }}
+      />
+
+      {/* 코멘트 — Primary 18 박스 */}
+      <div style={{ backgroundColor: '#F0E9FF', borderRadius: 12, padding: 12, marginBottom: 12 }}>
+        <p style={{ fontSize: 12, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.5, whiteSpace: 'pre-line' }}>{COMMENT}</p>
+      </div>
+
+      {/* 분석 텍스트 */}
+      {ANALYSIS.map((text, i) => (
+        <p key={i} style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, marginBottom: i < ANALYSIS.length - 1 ? 12 : 0, lineHeight: 1.6 }}>{text}</p>
+      ))}
+    </div>
+  )
+}
+
 /* ── 메인 페이지 ── */
 export default function MiyubotPage() {
   const navigate  = useNavigate()
@@ -532,7 +965,7 @@ export default function MiyubotPage() {
   const [inputValue,   setInputValue] = useState('')
   const [isTyping,     setIsTyping]   = useState(false)
   const isComposing = useRef(false)   // IME 한글 조합 중 여부
-  const [showCameraMenu, setShowCameraMenu] = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
   const [gptHistory,   setGptHistory] = useState([])  // GPT 대화 컨텍스트
   const [gptTurnCount, setGptTurnCount] = useState(0) // GPT 응답 횟수 (1턴=첫 응답)
   const bottomRef = useRef(null)
@@ -671,6 +1104,41 @@ export default function MiyubotPage() {
     }
   }
 
+  /* 카메라 촬영 완료 → 사진 말풍선 + AI 피부 진단 결과 카드 */
+  const handleCapture = async (dataUrl) => {
+    setShowCamera(false)
+    setMessages(prev => [...prev, { type: 'user-photo', dataUrl }])
+    setIsTyping(true)
+
+    let skinData = null
+    try {
+      const res = await fetch('/api/skin-diagnosis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageDataUrl: dataUrl }),
+      })
+      skinData = await res.json()
+    } catch {
+      // 실패 시 null → SkinResultCard 기본값 사용
+    }
+
+    // GPT 컨텍스트에 진단 결과 주입 (이후 제품 추천에 반영)
+    const diagnosisText = skinData
+      ? `[AI 피부 진단 결과]\n피부 타입: ${skinData.skin_type}\n특징: ${(skinData.tags ?? []).join(', ')}\n종합 점수: ${skinData.score}점\n수분량: ${skinData.moisture}점, 유분량: ${skinData.sebum}점, 탄력: ${skinData.elasticity}점`
+      : '[피부 진단 완료]'
+
+    setGptHistory(prev => [
+      ...prev,
+      { role: 'user', content: '[피부 진단 사진 촬영 완료]' },
+      { role: 'assistant', content: diagnosisText + '\n이 진단 결과를 기반으로 맞춤 스킨케어 제품을 추천해드리겠습니다.' },
+    ])
+
+    setTimeout(() => {
+      setIsTyping(false)
+      setMessages(prev => [...prev, { type: 'bot-skin-result', skinData }])
+    }, 5000)
+  }
+
   /* 입력창 직접 타이핑 → GPT API 호출 */
   const handleSend = async () => {
     const text = inputValue.trim()
@@ -736,6 +1204,8 @@ export default function MiyubotPage() {
   const renderMessage = (msg, idx) => {
     switch (msg.type) {
       case 'user':               return <UserBubble key={idx} text={msg.text} />
+      case 'user-photo':         return <UserPhotoBubble key={idx} dataUrl={msg.dataUrl} />
+      case 'bot-skin-result':    return <div key={idx} style={{ marginBottom: 20 }}><SkinResultCard skinData={msg.skinData} /></div>
       case 'bot-skincare':        return <SkincareInitCard key={idx} />
       case 'bot-skin-diagnosis':  return <SkinDiagnosisCard key={idx} onAction={handleDiagnosisAction} />
       case 'bot-diagnosis-method': return <DiagnosisMethodCard key={idx} />
@@ -747,7 +1217,7 @@ export default function MiyubotPage() {
       case 'bot-gpt':
         return (
           <div key={idx} className="msg-bot" style={{ marginBottom: 20 }}>
-            <div style={{ ...botCardStyle, marginBottom: msg.products?.length ? 8 : 0 }}>
+            <div style={{ ...botCardStyle, marginBottom: msg.products?.length ? 12 : 0 }}>
               <p style={{ fontSize: 15, fontWeight: 400, color: '#242227', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                 {msg.text}
               </p>
@@ -759,7 +1229,7 @@ export default function MiyubotPage() {
               }} />
             )}
             {msg.showOptions && !msg.products?.length && (
-              <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 12 }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 0 }}>
                 {['제품 추천', '루틴 추천'].map(label => (
                   <button
                     key={label}
@@ -822,7 +1292,7 @@ export default function MiyubotPage() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#FFFFFF' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', backgroundColor: '#FFFFFF', position: 'relative' }}>
 
       {/* ── 헤더 ── */}
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#FFFFFF' }}>
@@ -906,63 +1376,15 @@ export default function MiyubotPage() {
         <div ref={bottomRef} />
       </div>
 
-      {/* ── 카메라 팝업 ── */}
-      {showCameraMenu && (
-        <>
-          {/* 배경 오버레이 */}
-          <div
-            onClick={() => setShowCameraMenu(false)}
-            style={{ position: 'absolute', inset: 0, zIndex: 40 }}
-          />
-          {/* 팝업 카드 */}
-          <div style={{
-            position: 'absolute',
-            bottom: 92,
-            left: 20,
-            zIndex: 50,
-            backgroundColor: '#FFFFFF',
-            borderRadius: 16,
-            overflow: 'hidden',
-            boxShadow: '0 4px 20px rgba(36,34,39,0.14)',
-            minWidth: 180,
-          }}>
-            {[
-              { label: '사진 촬영',    icon: popupCameraIcon },
-              { label: '보관함에서 선택', icon: popupPhotoIcon },
-            ].map(({ label, icon }, i) => (
-              <button
-                key={label}
-                onClick={() => { setShowCameraMenu(false); console.log(label) /* TODO */ }}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '14px 18px',
-                  background: 'none',
-                  border: 'none',
-                  borderTop: i > 0 ? '1px solid #F0EFF3' : 'none',
-                  cursor: 'pointer',
-                  fontSize: 15,
-                  fontWeight: 500,
-                  color: '#242227',
-                  letterSpacing: '-0.01em',
-                  textAlign: 'left',
-                }}
-              >
-                <img src={icon} alt={label} style={{ width: 22, height: 22, display: 'block', flexShrink: 0 }} />
-                {label}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
+
+      {/* ── 카메라 오버레이 ── */}
+      {showCamera && <CameraOverlay onCapture={handleCapture} onClose={() => setShowCamera(false)} />}
 
       {/* ── 입력창 ── */}
       <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#FFFFFF', paddingLeft: 20, paddingRight: 20, paddingTop: 8, paddingBottom: 20, zIndex: 20 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, backgroundColor: '#F7F6F9', borderRadius: 99, width: 350, height: 60, padding: '16px 20px', boxSizing: 'border-box' }}>
           <button
-            onClick={() => setShowCameraMenu(prev => !prev)}
+            onClick={() => setShowCamera(true)}
             style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, display: 'flex' }}
           >
             <img src={cameraIcon} alt="카메라" style={{ width: 28, height: 28, display: 'block' }} />

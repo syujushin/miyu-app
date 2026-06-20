@@ -3,6 +3,34 @@ import { useNavigate } from 'react-router-dom'
 import reportBg    from '../../assets/images/home/home-report-bg.png'
 import waterDrop   from '../../assets/images/home/home-water-drop.png'
 import chevronIcon from '../../assets/Icon/home-card-allow.svg'
+import useWeather  from '../../hooks/useWeather'
+
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h >= 5  && h < 12) return '좋은 아침이에요'
+  if (h >= 12 && h < 18) return '좋은 오후예요'
+  if (h >= 18 && h < 22) return '좋은 저녁이에요'
+  return '좋은 밤이에요'
+}
+
+function getCardTip(weatherId, humidity, temp) {
+  if (!weatherId) return '오늘도 건강한 피부 관리\n잊지 마세요!'
+  if (weatherId >= 200 && weatherId < 300) return '오늘은 천둥번개가 예상되는 날이에요.\n외출 시 피부 보호에 신경써주세요.'
+  if (weatherId >= 300 && weatherId < 400) return '오늘은 가랑비가 내리는 날이에요.\n방수 메이크업으로 예쁨을 지켜요.'
+  if (weatherId >= 500 && weatherId < 600) return '오늘은 비가 오는 날이에요.\n방수 메이크업으로 예쁨을 지켜요.'
+  if (weatherId >= 600 && weatherId < 700) return '오늘은 눈이 내리는 날이에요.\n촉촉한 보습으로 피부를 지켜요.'
+  if (weatherId >= 700 && weatherId < 800) return '오늘은 미세먼지 주의 날이에요.\n외출 후 꼼꼼한 클렌징 필수예요.'
+  if (weatherId === 800) {
+    if (temp >= 30) return '오늘은 햇살이 강한 날이에요.\n선크림 꼼꼼히 챙겨주세요.'
+    if (humidity < 40) return '오늘은 맑지만 건조한 날이에요.\n수분 보충에 더 힘써주세요.'
+    return '오늘은 맑고 좋은 날이에요.\n외출 전 자외선 차단 잊지 마세요.'
+  }
+  if (weatherId > 800) {
+    if (humidity > 70) return '오늘은 흐리고 습한 날이에요.\n산뜻한 수분 밸런스 케어 추천해요.'
+    return '오늘은 흐린 날씨예요.\n보습 케어를 잊지 마세요.'
+  }
+  return '오늘도 건강한 피부 관리\n잊지 마세요!'
+}
 
 const metrics = [
   { label: '수분', score: 56 },
@@ -27,7 +55,7 @@ const glass = {
   ].join(', '),
 }
 
-function MetricsCard({ metrics }) {
+export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', barColor = '#7445D6', labelSize = 10, scoreSize = 16, barHeight = 2.5, rowGap = 2 }) {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
@@ -44,24 +72,25 @@ function MetricsCard({ metrics }) {
         justifyContent: 'center',
         padding: '0 12px',
         gap: 6,
+        ...containerStyle,
       }}
     >
       {metrics.map(({ label, score }) => (
         <div key={label} style={{ width: '100%' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
-            <span style={{ fontSize: 10, fontWeight: 400, color: '#242227', lineHeight: 1.5 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: rowGap }}>
+            <span style={{ fontSize: labelSize, fontWeight: 400, color: '#242227', lineHeight: 1.5 }}>
               {label}
             </span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: '#7445D6', lineHeight: 1 }}>{score}</span>
-              <span style={{ fontSize: 10, fontWeight: 400, color: '#242227' }}>점</span>
+              <span style={{ fontSize: scoreSize, fontWeight: 800, color: '#7445D6', lineHeight: 1 }}>{score}</span>
+              <span style={{ fontSize: labelSize, fontWeight: 400, color: '#242227' }}>점</span>
             </div>
           </div>
-          <div style={{ height: 2.5, borderRadius: 99, overflow: 'hidden', background: '#FFFFFF' }}>
+          <div style={{ height: barHeight, borderRadius: 99, overflow: 'hidden', background: trackColor }}>
             <div style={{
               width: ready ? `${score}%` : '0%',
               height: '100%',
-              background: '#7445D6',
+              background: barColor,
               transition: 'width 1s cubic-bezier(0.22, 1, 0.36, 1)',
             }} />
           </div>
@@ -111,6 +140,9 @@ function DonutChart({ score, size = 58 }) {
 export default function SkinReportCard() {
   const navigate  = useNavigate()
   const skinScore = 66
+  const { data, loading } = useWeather()
+  const greeting  = getGreeting()
+  const tip = loading ? null : getCardTip(data?.weatherId, data?.humidity, data?.temp)
 
   return (
     <div
@@ -147,11 +179,15 @@ export default function SkinReportCard() {
 
       <div style={{ paddingRight: 24 }}>
         <p style={{ fontSize: 18, fontWeight: 600, color: '#242227', lineHeight: 1.4, margin: 0 }}>
-          김구르님, 좋은 아침이에요.
+          김구르님, {greeting}.
         </p>
-        <p style={{ fontSize: 12, fontWeight: 400, color: '#5F5C66', marginTop: 4, lineHeight: 1.5, marginBottom: 0 }}>
-          오늘은 날씨가 건조하니<br />
-          수분 보충에 더 힘써주세요
+        <p style={{
+          fontSize: 12, fontWeight: 400, color: '#5F5C66',
+          marginTop: 4, lineHeight: 1.5, marginBottom: 0,
+          opacity: tip ? 1 : 0, transition: 'opacity 0.4s',
+          whiteSpace: 'pre-line',
+        }}>
+          {tip}
         </p>
       </div>
 
