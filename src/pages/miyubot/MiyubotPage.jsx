@@ -721,7 +721,7 @@ export default function MiyubotPage() {
         .then(data => {
           const raw = data.response
           setGptHistory(p => [...p, { role: 'assistant', content: raw }])
-          const strip = t => (t ?? '').replace(/\*\*/g, '').trim()
+          const strip = t => (t ?? '').replace(/\*\*/g, '').replace(/\\n/g, '\n').trim()
           let msgText = strip(raw), products = [], showOptions = false, showRoutineChips = false
           try {
             const j = JSON.parse(raw)
@@ -766,7 +766,7 @@ export default function MiyubotPage() {
         .then(data => {
           const raw = data.response
           setGptHistory(p => [...p, { role: 'assistant', content: raw }])
-          const strip = t => (t ?? '').replace(/\*\*/g, '').trim()
+          const strip = t => (t ?? '').replace(/\*\*/g, '').replace(/\\n/g, '\n').trim()
           let msgText = strip(raw), products = [], showOptions = false, showRoutineChips = false
           try {
             const j = JSON.parse(raw)
@@ -844,7 +844,7 @@ export default function MiyubotPage() {
       setGptHistory(prev => [...prev, { role: 'assistant', content: raw }])
 
       // JSON 파싱 → message + recommended_products 분리
-      const strip = (t) => (t ?? '').replace(/\*\*/g, '').trim()
+      const strip = (t) => (t ?? '').replace(/\*\*/g, '').replace(/\\n/g, '\n').trim()
 
       let msgText          = strip(raw)
       let products         = []
@@ -930,7 +930,7 @@ export default function MiyubotPage() {
                           .then(data => {
                             const raw2 = data.response
                             setGptHistory(p => [...p, { role: 'assistant', content: raw2 }])
-                            const strip2 = (t) => (t ?? '').replace(/\*\*/g, '').trim()
+                            const strip2 = (t) => (t ?? '').replace(/\*\*/g, '').replace(/\\n/g, '\n').trim()
                             let t2 = strip2(raw2), p2 = [], s2 = false
                             try { const j = JSON.parse(raw2); t2 = strip2(j.message ?? raw2); p2 = j.recommended_products ?? []; s2 = j.show_options === true } catch {}
                             setMessages(p => [...p, { type: 'bot-gpt', text: t2, products: p2, showOptions: s2 }])

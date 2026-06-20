@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import addIcon      from '../../assets/images/home/add.svg'
 import heartActive   from '../../assets/Icon/ui/icon-heart-active.svg'
 import heartInactive from '../../assets/Icon/ui/icon-heart-inactive.svg'
@@ -172,6 +172,35 @@ export default function TopReviewSection() {
     tabScrollRef.current.scrollLeft = scrollLeft.current - walk
   }
   const onTabMouseUp = () => { isDragging.current = false }
+
+  useEffect(() => {
+    const el = tabScrollRef.current
+    if (!el) return
+    let startTouchX = 0
+    let startTouchY = 0
+    let isHorizontal = null
+    const onTouchStart = (e) => {
+      startTouchX = e.touches[0].clientX
+      startTouchY = e.touches[0].clientY
+      isHorizontal = null
+    }
+    const onTouchMove = (e) => {
+      const dx = e.touches[0].clientX - startTouchX
+      const dy = e.touches[0].clientY - startTouchY
+      if (isHorizontal === null) isHorizontal = Math.abs(dx) > Math.abs(dy)
+      if (isHorizontal) {
+        e.preventDefault()
+        el.scrollLeft -= dx
+        startTouchX = e.touches[0].clientX
+      }
+    }
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [])
 
   const filtered = REVIEW_ITEMS.filter(
     (item) => item.category === selectedCat

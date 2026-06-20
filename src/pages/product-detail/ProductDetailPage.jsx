@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import logoMain     from '../../assets/logo/Top/Logo.svg'
@@ -18,6 +18,8 @@ import imgReview04  from '../../assets/images/review/review04.png'
 
 import badgeLv4 from '../../assets/Icon/badges/Property 1=badge-lv4-pro.svg'
 import badgeLv2 from '../../assets/Icon/badges/Property 1=badge-lv2-rookie.svg'
+
+import ReviewCard from '../../components/review/ReviewCard'
 
 import imgTonerEsnature  from '../../assets/images/product/product-toner-esnature-oasis.png'
 import imgCapsuleAnua    from '../../assets/images/product/product-capsule-anua.png'
@@ -42,13 +44,13 @@ const REVIEWS_PREVIEW = [
 ]
 
 const TOGETHER_PRODUCTS = [
-  { name: '에스네이처 아쿠아 오아시스 토너 300ml', price: '24,000원', img: imgTonerEsnature },
-  { name: '아누아 피디알엔 캡슐 100 세럼 50ml 대용량 기획', price: '23,500원', img: imgCapsuleAnua },
-  { name: '에스네이처 아쿠아 스쿠알란 수분크림 60ml', price: '23,500원', img: imgCreamEsnature },
-  { name: '아떼 비건 릴리프 무기자차 민감피부 선크림 50ml', price: '34,000원', img: imgSuncreamAtte },
+  { brand: '에스네이처', name: '아쿠아 오아시스 토너 300ml', price: '24,000원', img: imgTonerEsnature },
+  { brand: '아누아', name: '피디알엔 캡슐 100 세럼 50ml 대용량 기획', price: '23,500원', img: imgCapsuleAnua },
+  { brand: '에스네이처', name: '아쿠아 스쿠알란 수분크림 60ml', price: '23,500원', img: imgCreamEsnature },
+  { brand: '아떼', name: '비건 릴리프 무기자차 민감피부 선크림 50ml', price: '34,000원', img: imgSuncreamAtte },
 ]
 
-function StarRow({ rating, size = 14, fillColor = '#6633CC', emptyColor = '#E3D4FD', gap = 2 }) {
+function StarRow({ rating, size = 14, fillColor = '#6633CC', emptyColor = '#9169EB', gap = 2 }) {
   return (
     <div style={{ display: 'flex' }}>
       {[1,2,3,4,5].map((i, idx) => {
@@ -84,6 +86,61 @@ export default function ProductDetailPage() {
   const [liked, setLiked] = useState(false)
   const [pop,   setPop]   = useState(false)
   const toggleLike = () => { setLiked(p => !p); setPop(true); setTimeout(() => setPop(false), 300) }
+
+  const [reactions, setReactions] = useState({})
+  const toggleReaction = (reviewId, label) => {
+    setReactions(prev => ({
+      ...prev,
+      [reviewId]: { ...prev[reviewId], [label]: !prev[reviewId]?.[label] },
+    }))
+  }
+
+  const togetherScrollRef = useRef(null)
+  const isDraggingTogether = useRef(false)
+  const togetherStartX = useRef(0)
+  const togetherScrollLeft = useRef(0)
+
+  const onTogetherMouseDown = (e) => {
+    isDraggingTogether.current = true
+    togetherStartX.current = e.pageX - togetherScrollRef.current.offsetLeft
+    togetherScrollLeft.current = togetherScrollRef.current.scrollLeft
+  }
+  const onTogetherMouseMove = (e) => {
+    if (!isDraggingTogether.current) return
+    e.preventDefault()
+    const x = e.pageX - togetherScrollRef.current.offsetLeft
+    togetherScrollRef.current.scrollLeft = togetherScrollLeft.current - (x - togetherStartX.current)
+  }
+  const onTogetherMouseUp = () => { isDraggingTogether.current = false }
+
+  useEffect(() => {
+    const el = togetherScrollRef.current
+    if (!el) return
+    let startX = 0
+    let startY = 0
+    let isHorizontal = null
+    const onTouchStart = (e) => {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      isHorizontal = null
+    }
+    const onTouchMove = (e) => {
+      const dx = e.touches[0].clientX - startX
+      const dy = e.touches[0].clientY - startY
+      if (isHorizontal === null) isHorizontal = Math.abs(dx) > Math.abs(dy)
+      if (isHorizontal) {
+        e.preventDefault()
+        el.scrollLeft -= dx
+        startX = e.touches[0].clientX
+      }
+    }
+    el.addEventListener('touchstart', onTouchStart, { passive: true })
+    el.addEventListener('touchmove', onTouchMove, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onTouchStart)
+      el.removeEventListener('touchmove', onTouchMove)
+    }
+  }, [])
 
   const TAB = { borderBottom: '1px solid #242227', color: '#242227', fontWeight: 600 }
   const TAB_OFF = { borderBottom: '1px solid transparent', color: '#242227', fontWeight: 400 }
@@ -196,7 +253,7 @@ export default function ProductDetailPage() {
         {activeTab === 'review' && (
           <div style={{ padding: '0 20px' }}>
             {/* 리뷰 헤더 */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 20, marginBottom: 16 }}>
               <p style={{ margin: 0, cursor: 'pointer' }} onClick={() => navigate('/product-review/vinote')}>
                 <span style={{ fontSize: 16, fontWeight: 400, color: '#242227', lineHeight: 1.5 }}>총 </span>
                 <span style={{ fontSize: 16, fontWeight: 600, color: '#9169EB', lineHeight: 1.5 }}>4,351</span>
@@ -261,94 +318,76 @@ export default function ProductDetailPage() {
             </div>{/* 평점 분포 + 리뷰 이미지 묶음 끝 */}
 
             {/* 리뷰 목록 */}
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               {REVIEWS_PREVIEW.map(r => (
-                <div key={r.id} style={{ borderBottom: '1px solid #F0EFF3', paddingBottom: 24, marginBottom: 24 }}>
-                  {/* 작성자 헤더 */}
-                  <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                    <img src={imgProfile} alt="프로필" style={{ width: 58, height: 58, borderRadius: 99, flexShrink: 0, display: 'block' }} />
-                    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: 58, justifyContent: 'space-between' }}>
-                      {/* 닉네임 + 뱃지 + 시간/신고 */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                        <span style={{ fontSize: 16, fontWeight: 500, color: '#242227', lineHeight: 1 }}>{r.user}</span>
-                        <img src={r.badge} alt={r.level} style={{ height: 19, display: 'block', flexShrink: 0 }} />
-                        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                          <span style={{ fontSize: 10, fontWeight: 400, color: '#9D9AA3', lineHeight: 1.7 }}>{r.time}</span>
-                          <div style={{ width: 0.3, height: 10, backgroundColor: '#DAD8DE' }} />
-                          <span style={{ fontSize: 10, fontWeight: 400, color: '#9D9AA3', lineHeight: 1.7, cursor: 'pointer' }}>신고</span>
-                        </div>
-                      </div>
-                      {/* 피부 태그 */}
-                      <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                        {r.tags.map(t => (
-                          <span key={t} style={{ fontSize: 11, fontWeight: 400, color: '#78757D', lineHeight: 1.5, borderRadius: 4, padding: '0 4px', backgroundColor: '#F7F6F9' }}>{t}</span>
-                        ))}
-                      </div>
-                      {/* 별점 */}
-                      <StarRow rating={r.rating} size={12} fillColor="#C0A3F7" emptyColor="#DAD8DE" gap={-1} />
-                    </div>
-                  </div>
-                  {/* 리뷰 이미지 */}
-                  {r.images.length > 0 && (
-                    <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
-                      {r.images.map((img, i) => (
-                        <div key={i} style={{ width: 80, height: 80, borderRadius: 10, overflow: 'hidden', backgroundColor: '#F0EFF3', flexShrink: 0 }}>
-                          <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {/* 리뷰 텍스트 */}
-                  <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', margin: '0 0 14px', lineHeight: 1.5, whiteSpace: 'pre-line' }}>{r.text}</p>
-                  {/* 반응 버튼 */}
-                  <div style={{ display: 'flex', gap: 6 }}>
-                    {[
-                      { label: '믿음이가요', count: r.likes },
-                      { label: '도움돼요', count: r.helpful },
-                      { label: '써보고싶어요', count: r.wishlist },
-                    ].map(({ label, count }) => (
-                      <button key={label} style={{ padding: '6px 12px', borderRadius: 99, border: '1px solid #DAD8DE', backgroundColor: '#FFFFFF', fontSize: 12, fontWeight: 400, color: '#78757D', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-                        {label} <span style={{ fontWeight: 600, color: '#5F5C66' }}>{count}</span>
-                      </button>
-                    ))}
-                  </div>
+                <div key={r.id}>
+                  <div style={{ height: 1, backgroundColor: '#F4F3F7', marginLeft: -20, marginRight: -20, marginBottom: 20 }} />
+                  <ReviewCard {...r} reactions={reactions} toggleReaction={toggleReaction} />
                 </div>
               ))}
             </div>
 
-            {/* 함께 구매한 제품 */}
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <p style={{ fontSize: 15, fontWeight: 600, color: '#242227', margin: 0 }}>다른 고객들과 함께 구매한 제품</p>
-                <button style={{ fontSize: 12, color: '#9D9AA3', background: 'none', border: 'none', cursor: 'pointer' }}>더보기 &gt;</button>
-              </div>
-              <div style={{ display: 'flex', gap: 8, overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
-                {TOGETHER_PRODUCTS.map((p, i) => (
-                  <div key={i} style={{ width: 100, flexShrink: 0 }}>
-                    <div style={{ width: 100, height: 100, borderRadius: 10, backgroundColor: '#F0EFF3', marginBottom: 6, overflow: 'hidden' }}>
-                      <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                    </div>
-                    <p style={{ fontSize: 11, color: '#242227', margin: '0 0 2px', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{p.name}</p>
-                    <p style={{ fontSize: 12, fontWeight: 700, color: '#6633CC', margin: 0 }}>{p.price}</p>
+          </div>
+        )}
+
+        {activeTab === 'review' && (
+          <div style={{ marginBottom: 20, marginTop: 20 }}>
+            <div style={{ height: 1, backgroundColor: '#F4F3F7', marginBottom: 20 }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, padding: '0 20px' }}>
+              <p style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.4, color: '#242227', margin: 0 }}>다른 고객이 함께 구매한 제품</p>
+              <button style={{ fontSize: 12, color: '#9D9AA3', background: 'none', border: 'none', cursor: 'pointer' }}>더보기 &gt;</button>
+            </div>
+            <div
+              ref={togetherScrollRef}
+              style={{ display: 'flex', gap: 8, overflowX: 'auto', msOverflowStyle: 'none', scrollbarWidth: 'none', paddingLeft: 20, paddingRight: 20, cursor: 'default', userSelect: 'none' }}
+              onMouseDown={onTogetherMouseDown}
+              onMouseMove={onTogetherMouseMove}
+              onMouseUp={onTogetherMouseUp}
+              onMouseLeave={onTogetherMouseUp}
+            >
+              {TOGETHER_PRODUCTS.map((p, i) => (
+                <div key={i} style={{
+                  flexShrink: 0,
+                  width: 96,
+                  padding: '0 8px 8px',
+                  borderRadius: 12,
+                  border: '1px solid #F0EFF3',
+                  boxSizing: 'border-box',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 8,
+                }}>
+                  <div style={{ width: 80, height: 80, borderRadius: 8, overflow: 'hidden' }}>
+                    <img src={p.img} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
-                ))}
-              </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#5F5C66', lineHeight: 1.5 }}>{p.brand}</span>
+                    <span style={{ fontSize: 12, fontWeight: 400, color: '#78757D', lineHeight: 1.5, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{p.name}</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: '#6633CC', lineHeight: 1.5 }}>{p.price}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
 
       {/* ── 하단 구매 바 ── */}
-      <div style={{ position: 'sticky', bottom: 0, backgroundColor: '#FFFFFF', padding: '12px 16px 20px', borderTop: '1px solid #F0EFF3' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-          <button onClick={toggleLike} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
-            <svg className={pop ? 'heart-pop' : ''} width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
+      <div style={{ position: 'relative', backgroundColor: '#FFFFFF', paddingTop: 16, paddingBottom: 32, paddingLeft: 16, paddingRight: 16, borderTop: '1px solid #F0EFF3' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* 하트 + 숫자 */}
+          <button
+            onClick={toggleLike}
+            style={{ width: 50, height: 48, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, gap: 2 }}
+          >
+            <svg className={pop ? 'heart-pop' : ''} width="28" height="28" viewBox="0 0 24 24" fill="none" style={{ display: 'block' }}>
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                fill={liked ? '#6633CC' : 'none'} stroke={liked ? '#6633CC' : '#9D9AA3'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                fill={liked ? '#6633CC' : 'none'} stroke={liked ? '#6633CC' : '#78757D'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            <span style={{ fontSize: 10, color: '#9D9AA3', marginTop: 2 }}>13,677</span>
+            <span style={{ fontSize: 14, fontWeight: 400, lineHeight: 1.4, color: '#78757D' }}>13,677</span>
           </button>
-          <button style={{ flex: 1, height: 52, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 16, fontWeight: 600 }}>
+          {/* 구매하기 버튼 */}
+          <button style={{ width: 300, height: 50, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 17, fontWeight: 600, lineHeight: 1.4, flexShrink: 0 }}>
             구매하기
           </button>
         </div>

@@ -41,7 +41,7 @@ export default function AppLayout() {
         <div
           key={animKey}
           className={animClass}
-          style={{ height: '100%', overflowY: 'auto', overflowX: 'hidden', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
+          style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           <Outlet />
         </div>
