@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import AppLayout      from './components/layout/AppLayout'
 import HomePage       from './pages/home/HomePage'
@@ -11,10 +12,17 @@ import AiDemoPage          from './pages/ai-demo/AiDemoPage'
 import ProductReviewPage   from './pages/product-review/ProductReviewPage'
 import ProductDetailPage   from './pages/product-detail/ProductDetailPage'
 import CameraPage          from './pages/camera/CameraPage'
+import SplashPage            from './pages/onboarding/SplashPage'
+import OnboardingPhotoPage    from './pages/onboarding/OnboardingPhotoPage'
+import OnboardingSkinCheckPage  from './pages/onboarding/OnboardingSkinCheckPage'
+import OnboardingLifestylePage  from './pages/onboarding/OnboardingLifestylePage'
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(false)
+
   return (
     <BrowserRouter>
+      {showSplash && <SplashPage onDismiss={() => setShowSplash(false)} />}
       <Routes>
         <Route element={<AppLayout />}>
           <Route index           element={<HomePage />} />
@@ -27,6 +35,9 @@ export default function App() {
           <Route path="mypage/skin-data" element={<SkinDataPage />} />
         </Route>
         {/* 독립 전체화면 페이지 (AppLayout 없음) */}
+        <Route path="onboarding" element={<OnboardingPhotoPage />} />
+        <Route path="onboarding/skin-check" element={<OnboardingSkinCheckPage />} />
+        <Route path="onboarding/lifestyle"  element={<OnboardingLifestylePage />} />
         <Route path="ai-demo" element={<AiDemoPage />} />
         <Route path="camera"  element={<CameraPage />} />
         <Route path="product-detail/:productId" element={<ProductDetailPage />} />

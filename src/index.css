@@ -192,3 +192,10 @@ body {
   display: flex;
   flex-direction: column;
 }
+
+/* 온보딩 음수량 슬라이더 */
+.miyu-slider { -webkit-appearance: none; appearance: none; outline: none; border: none; background: transparent; width: 100%; }
+.miyu-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 15px; height: 15px; border-radius: 50%; background: #FFFFFF; border: none; box-shadow: 6px 6px 10px rgba(0,0,0,0.10); cursor: pointer; margin-top: -4.5px; }
+.miyu-slider::-webkit-slider-runnable-track { height: 6px; border-radius: 99px; }
+.miyu-slider::-moz-range-thumb { width: 15px; height: 15px; border-radius: 50%; background: #FFFFFF; border: none; box-shadow: 6px 6px 10px rgba(0,0,0,0.10); cursor: pointer; }
+.miyu-slider::-moz-range-track { height: 6px; border-radius: 99px; }

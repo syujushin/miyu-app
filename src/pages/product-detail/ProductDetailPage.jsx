@@ -123,7 +123,10 @@ export default function ProductDetailPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 16, fontWeight: 400, color: '#78757D', lineHeight: 1.4 }}>비노트</span>
             <span style={{ fontSize: 20, fontWeight: 600, color: '#242227', lineHeight: 1.5 }}>물톡스 부스터 앰플 30ml</span>
-            <span style={{ fontSize: 20, fontWeight: 800, color: '#6633CC', lineHeight: 1.5 }}>35,900원</span>
+            <span style={{ lineHeight: 1.5 }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: '#6633CC' }}>35,900</span>
+              <span style={{ fontSize: 20, fontWeight: 400, color: '#6633CC' }}>원</span>
+            </span>
           </div>
           {/* 리뷰 행 */}
           <button
