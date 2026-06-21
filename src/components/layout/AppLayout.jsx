@@ -28,9 +28,8 @@ export default function AppLayout() {
   const prevPath   = useRef(pathname)
   const [animKey,   setAnimKey]   = useState(0)
   const [animClass, setAnimClass] = useState('')
-  const { guideVisible, step, currentHighlight } = useGuide()
+  const { guideVisible, guideDone, step, currentHighlight } = useGuide()
   const scrollRef = useRef(null)
-  const prevGuideVisible = useRef(guideVisible)
 
   useLayoutEffect(() => {
     if (!guideVisible || !scrollRef.current) return
@@ -51,16 +50,7 @@ export default function AppLayout() {
     container.scrollTop = Math.max(0, elAbsoluteBottom - containerRect.height + 60)
   }, [guideVisible, step, currentHighlight])
 
-  // 가이드 종료 시 콘텐츠 리마운트 → stagger 애니메이션 재생
-  useEffect(() => {
-    if (prevGuideVisible.current && !guideVisible) {
-      setAnimClass('')
-      setAnimKey(k => k + 1)
-    }
-    prevGuideVisible.current = guideVisible
-  }, [guideVisible])
-
-  useEffect(() => {
+useEffect(() => {
     if (prevPath.current !== pathname) {
       setAnimClass(getPageClass(prevPath.current, pathname))
       setAnimKey(k => k + 1)
@@ -74,7 +64,7 @@ export default function AppLayout() {
         <div
           ref={scrollRef}
           key={animKey}
-          className={`${animClass}${guideVisible ? ' guide-active' : ''}`}
+          className={`${animClass}${guideVisible ? ' guide-active' : ''}${guideDone ? ' guide-done' : ''}`}
           style={{ height: '100%', overflowY: guideVisible ? 'hidden' : 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           <Outlet />
@@ -87,7 +77,11 @@ export default function AppLayout() {
         </div>
       )}
 
-      <GuideFAB bottom={showBanner && pathname !== '/miyubot' && !pathname.startsWith('/mypage') ? 131 : 103} />
+      <GuideFAB bottom={
+        pathname === '/miyubot' ? 104
+        : showBanner && pathname === '/' ? 131
+        : 103
+      } />
       {pathname !== '/miyubot' && <BottomNavigation />}
     </div>
   )

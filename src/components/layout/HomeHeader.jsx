@@ -11,7 +11,7 @@ export default function HomeHeader() {
     <>
       <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
       <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 16 }}>
-        <button onClick={() => navigate('/')} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
+        <button onClick={() => navigate('/')} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', transition: 'none' }}>
           <img src={logo} alt="miyu" style={{ width: 84, height: 29, display: 'block' }} />
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

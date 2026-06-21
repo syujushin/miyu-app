@@ -57,14 +57,15 @@ const glass = {
 }
 
 export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', barColor = '#7445D6', labelSize = 10, scoreSize = 16, barHeight = 2.5, rowGap = 2 }) {
-  const { guideVisible } = useGuide()
-  const [ready, setReady] = useState(guideVisible)
+  const { guideVisible, guideDone } = useGuide()
+  const skipAnim = guideVisible || guideDone
+  const [ready, setReady] = useState(skipAnim)
 
   useEffect(() => {
-    if (guideVisible) { setReady(true); return }
+    if (skipAnim) { setReady(true); return }
     const id = requestAnimationFrame(() => setReady(true))
     return () => cancelAnimationFrame(id)
-  }, [guideVisible])
+  }, [skipAnim])
 
   return (
     <div
@@ -104,17 +105,18 @@ export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', b
 }
 
 function DonutChart({ score, size = 58 }) {
-  const { guideVisible } = useGuide()
+  const { guideVisible, guideDone } = useGuide()
+  const skipAnim = guideVisible || guideDone
   const sw = 3
   const r  = size / 2 - sw / 2
   const cx = size / 2
   const cy = size / 2
   const C  = 2 * Math.PI * r
-  const [animated, setAnimated] = useState(guideVisible ? (score / 100) * C : 0)
+  const [animated, setAnimated] = useState(skipAnim ? (score / 100) * C : 0)
 
   useEffect(() => {
     const target = (score / 100) * C
-    if (guideVisible) { setAnimated(target); return }
+    if (skipAnim) { setAnimated(target); return }
     const duration = 900
     const start    = performance.now()
     const easeOut  = (t) => 1 - Math.pow(1 - t, 3)
@@ -124,7 +126,7 @@ function DonutChart({ score, size = 58 }) {
       if (t < 1) requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
-  }, [score, C, guideVisible])
+  }, [score, C, skipAnim])
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>

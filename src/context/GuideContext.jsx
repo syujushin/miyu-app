@@ -34,13 +34,17 @@ export function GuideProvider({ children }) {
   const [step, setStep] = useState(0)
   const [finished, setFinished] = useState(false)
   const [started, setStarted] = useState(false)
+  const [fabIntroSeen, setFabIntroSeen] = useState(false)
   const location = useLocation()
 
   const startGuide = useCallback(() => {
     setStep(0)
     setFinished(false)
     setStarted(true)
+    setFabIntroSeen(true)
   }, [])
+
+  const dismissFabIntro = useCallback(() => setFabIntroSeen(true), [])
 
   const next = useCallback(() => {
     if (step >= GUIDE_STEPS.length - 1) setFinished(true)
@@ -50,10 +54,12 @@ export function GuideProvider({ children }) {
   const skip = useCallback(() => setFinished(true), [])
 
   const guideVisible = started && !finished && location.pathname === '/'
+  const guideDone = started && finished
+  const fabIntroVisible = !fabIntroSeen && !started && location.pathname === '/'
   const currentHighlight = GUIDE_STEPS[step]?.highlight ?? null
 
   return (
-    <GuideContext.Provider value={{ step, currentHighlight, guideVisible, startGuide, next, skip }}>
+    <GuideContext.Provider value={{ step, currentHighlight, guideVisible, guideDone, fabIntroVisible, startGuide, dismissFabIntro, next, skip }}>
       {children}
     </GuideContext.Provider>
   )

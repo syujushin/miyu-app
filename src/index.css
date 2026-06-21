@@ -99,7 +99,7 @@
 .stagger-6 { animation-delay: 0.34s; }
 .stagger-7 { animation-delay: 0.40s; }
 
-/* 가이드 활성화 중에는 stagger/페이지 진입 애니메이션 억제 */
+/* 가이드 활성화 중 / 종료 후: stagger 애니메이션 억제 */
 .guide-active .stagger,
 .guide-active .stagger-1,
 .guide-active .stagger-2,
@@ -107,7 +107,15 @@
 .guide-active .stagger-4,
 .guide-active .stagger-5,
 .guide-active .stagger-6,
-.guide-active .stagger-7 {
+.guide-active .stagger-7,
+.guide-done .stagger,
+.guide-done .stagger-1,
+.guide-done .stagger-2,
+.guide-done .stagger-3,
+.guide-done .stagger-4,
+.guide-done .stagger-5,
+.guide-done .stagger-6,
+.guide-done .stagger-7 {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
