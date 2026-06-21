@@ -10,6 +10,9 @@ import iconCart     from '../../assets/Icon/ui/icon-cart.svg'
 import statusBarSvg from '../../assets/Top/Status Bar.svg'
 import imgVinote    from '../../assets/images/product/product-ampoule-vinote.png'
 import imgHero      from '../../assets/images/review/review-bnote.png'
+import imgHero02    from '../../assets/images/review/review-bnote02.png'
+import imgHero03    from '../../assets/images/review/review-bnote03.png'
+import imgHero04    from '../../assets/images/review/review-bnote04.png'
 import imgProfile   from '../../assets/images/review/Profile.svg'
 import imgReview01  from '../../assets/images/review/review01.png'
 import imgReview02  from '../../assets/images/review/review02.png'
@@ -82,6 +85,10 @@ function StarRow({ rating, size = 14, fillColor = '#6633CC', emptyColor = '#9169
 
 export default function ProductDetailPage() {
   const navigate = useNavigate()
+  const [heroSlide, setHeroSlide] = useState(0)
+  const heroTouchStartX = useRef(null)
+  const HERO_IMAGES = [imgHero, imgHero02, imgHero04, imgHero03]
+
   const [activeTab, setActiveTab] = useState('review')
   const [liked, setLiked] = useState(false)
   const [pop,   setPop]   = useState(false)
@@ -168,10 +175,38 @@ export default function ProductDetailPage() {
       {/* ── 스크롤 콘텐츠 ── */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
 
-        {/* 제품 히어로 이미지 */}
-        <div style={{ width: '100%', height: 390, overflow: 'hidden', flexShrink: 0 }}>
-          <img src={imgHero} alt="비노트 물톡스 부스터 앰플" draggable={false}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        {/* 제품 히어로 이미지 캐러셀 */}
+        <div
+          style={{ position: 'relative', width: '100%', height: 390, overflow: 'hidden', flexShrink: 0, touchAction: 'pan-y', userSelect: 'none' }}
+          onTouchStart={e => { heroTouchStartX.current = e.touches[0].clientX }}
+          onTouchEnd={e => {
+            const dx = e.changedTouches[0].clientX - heroTouchStartX.current
+            if (dx < -40 && heroSlide < HERO_IMAGES.length - 1) setHeroSlide(s => s + 1)
+            if (dx > 40  && heroSlide > 0) setHeroSlide(s => s - 1)
+          }}
+          onMouseDown={e => { heroTouchStartX.current = e.clientX }}
+          onMouseUp={e => {
+            const dx = e.clientX - heroTouchStartX.current
+            if (dx < -40 && heroSlide < HERO_IMAGES.length - 1) setHeroSlide(s => s + 1)
+            if (dx > 40  && heroSlide > 0) setHeroSlide(s => s - 1)
+          }}
+        >
+          {HERO_IMAGES.map((src, i) => (
+            <img key={i} src={src} alt={`비노트 ${i + 1}`} draggable={false}
+              style={{
+                position: 'absolute', top: 0, left: `${i * 100}%`,
+                width: '100%', height: '100%', objectFit: 'cover',
+                transform: `translateX(-${heroSlide * 100}%)`,
+                transition: 'transform 0.3s ease',
+              }}
+            />
+          ))}
+          {/* 도트 인디케이터 */}
+          <div style={{ position: 'absolute', bottom: 14, left: 0, right: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, zIndex: 1 }}>
+            {HERO_IMAGES.map((_, i) => (
+              <div key={i} onClick={() => setHeroSlide(i)} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === heroSlide ? '#9169EB' : '#F0EFF3', transition: 'background-color 0.25s ease', cursor: 'pointer' }} />
+            ))}
+          </div>
         </div>
 
         {/* ── 제품 기본 정보 ── */}
@@ -373,7 +408,7 @@ export default function ProductDetailPage() {
       </div>
 
       {/* ── 하단 구매 바 ── */}
-      <div style={{ position: 'relative', backgroundColor: '#FFFFFF', paddingTop: 16, paddingBottom: 32, paddingLeft: 16, paddingRight: 16, borderTop: '1px solid #F0EFF3' }}>
+      <div style={{ position: 'relative', backgroundColor: '#FFFFFF', paddingTop: 16, paddingBottom: 32, paddingLeft: 16, paddingRight: 16, borderTop: 'none' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* 하트 + 숫자 */}
           <button

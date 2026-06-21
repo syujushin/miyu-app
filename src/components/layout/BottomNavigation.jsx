@@ -53,6 +53,7 @@ export default function BottomNavigation() {
           >
             {({ isActive }) => (
               <div
+                data-guide-id={to === '/miyubot' ? 'miyubot-nav' : undefined}
                 style={{
                   width: 48,
                   height: 48,

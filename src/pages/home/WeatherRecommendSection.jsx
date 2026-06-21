@@ -17,9 +17,10 @@ const PRODUCTS = [
   { id: 4, img: imgAtte,          name: '아떼',       detail: '비건 릴리프 무기자차 민감피부 선크림 50ml', price: '34,000' },
 ]
 
-function WeatherProductCard({ img, name, detail, price, imgOffsetX = 0, imgSize = 80 }) {
+function WeatherProductCard({ img, name, detail, price, imgOffsetX = 0, imgSize = 80, guideIdx }) {
   return (
     <div
+      data-guide-id={`weather-card-${guideIdx}`}
       style={{
         width: 95,
         height: 151,
@@ -114,8 +115,8 @@ export default function WeatherRecommendSection() {
 
       {/* 상품 가로 스크롤 */}
       <HorizontalScroll paddingX={16} gap={8}>
-        {PRODUCTS.map((p) => (
-          <WeatherProductCard key={p.id} {...p} />
+        {PRODUCTS.map((p, i) => (
+          <WeatherProductCard key={p.id} {...p} guideIdx={i} />
         ))}
       </HorizontalScroll>
     </div>

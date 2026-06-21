@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { CameraOverlay } from '../../components/camera/FaceScanCamera'
 import statusBarSvg from '../../assets/Top/Status Bar.svg'
 import logoIcon from '../../assets/logo/logo-icon-square.svg'
@@ -17,6 +18,15 @@ const TIPS = [
   { icon: tipNoFilter,    text: '보정된 이미지는 정확한 진단이 어려울 수 있습니다.' },
 ]
 
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } },
+}
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+}
+
 export default function OnboardingPhotoPage() {
   const navigate = useNavigate()
   const [showCamera, setShowCamera] = useState(false)
@@ -27,39 +37,36 @@ export default function OnboardingPhotoPage() {
   }
 
   return (
-    <div
+    <motion.div
+      exit={{ x: '-25%', opacity: 0 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       style={{
+        position: 'absolute',
+        inset: 0,
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
         backgroundColor: '#FFFFFF',
         fontFamily: "'SUIT', sans-serif",
         letterSpacing: '-0.01em',
-        position: 'relative',
       }}
     >
-      {/* Status bar: 47px */}
       <img src={statusBarSvg} alt="" style={{ width: '100%', flexShrink: 0 }} />
 
-      {/* Scrollable content */}
-      {/* paddingTop 45 = 92 - 47(status bar) → title starts at 92px from top */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '45px 20px 120px' }}>
-
-        {/* Title: 24 SemiBold 140% GrayScale20 */}
-        <h1
-          style={{
-            fontSize: 24,
-            fontWeight: 600,
-            color: '#242227',
-            lineHeight: 1.4,
-            margin: 0,
-          }}
+      <motion.div
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+        style={{ flex: 1, overflowY: 'auto', padding: '45px 20px 120px' }}
+      >
+        <motion.h1
+          variants={fadeUp}
+          style={{ fontSize: 24, fontWeight: 600, color: '#242227', lineHeight: 1.4, margin: 0 }}
         >
           촬영 또는 이미지를<br />선택해주세요
-        </h1>
+        </motion.h1>
 
-        {/* AI Analysis Card: 46px below title, 350×76 */}
-        <div
+        <motion.div
+          variants={fadeUp}
           style={{
             marginTop: 46,
             height: 76,
@@ -72,7 +79,6 @@ export default function OnboardingPhotoPage() {
             boxSizing: 'border-box',
           }}
         >
-          {/* Left group */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, flexShrink: 0 }} />
@@ -84,8 +90,6 @@ export default function OnboardingPhotoPage() {
               퍼스널 컬러 · 피부 타입 · 유수분 · 탄력
             </span>
           </div>
-
-          {/* Right: face scan icon → open camera */}
           <button
             onClick={() => setShowCamera(true)}
             style={{
@@ -96,53 +100,37 @@ export default function OnboardingPhotoPage() {
           >
             <img src={iconFaceScan} alt="카메라로 스캔" style={{ width: 44, height: 44 }} />
           </button>
-        </div>
+        </motion.div>
 
-        {/* Sample Image: 12px below card, 350×230 */}
-        <div
-          style={{
-            marginTop: 12,
-            height: 230,
-            borderRadius: 16,
-            overflow: 'hidden',
-            backgroundColor: '#F0EFF3',
-          }}
+        <motion.div
+          variants={fadeUp}
+          style={{ marginTop: 12, height: 230, borderRadius: 16, overflow: 'hidden', backgroundColor: '#F0EFF3' }}
         >
           <img
             src={faceScanOverlay}
             alt="face scan sample"
             style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           />
-        </div>
+        </motion.div>
 
-        {/* Tips section */}
-        <p
-          style={{
-            fontSize: 16,
-            fontWeight: 600,
-            color: '#242227',
-            lineHeight: 1.5,
-            margin: 0,
-            marginTop: 24,
-            marginBottom: 12,
-          }}
-        >
-          정확한 분석 팁
-        </p>
+        <motion.div variants={fadeUp}>
+          <p style={{
+            fontSize: 16, fontWeight: 600, color: '#242227', lineHeight: 1.5,
+            margin: 0, marginTop: 24, marginBottom: 12,
+          }}>
+            정확한 분석 팁
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {TIPS.map(({ icon, text }) => (
+              <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <img src={icon} alt="" style={{ width: 20, height: 20, flexShrink: 0 }} />
+                <span style={{ fontSize: 14, fontWeight: 400, color: '#78757D', lineHeight: 1 }}>{text}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {TIPS.map(({ icon, text }) => (
-            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <img src={icon} alt="" style={{ width: 20, height: 20, flexShrink: 0 }} />
-              <span style={{ fontSize: 14, fontWeight: 400, color: '#78757D', lineHeight: 1 }}>
-                {text}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom Buttons */}
       <div
         style={{
           position: 'absolute',
@@ -182,13 +170,12 @@ export default function OnboardingPhotoPage() {
         <div style={{ width: 140, height: 5, borderRadius: 99, backgroundColor: '#000000', marginBottom: 8 }} />
       </div>
 
-      {/* Camera overlay (same as Miyubot) */}
       {showCamera && (
         <CameraOverlay
           onCapture={handleCapture}
           onClose={() => setShowCamera(false)}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

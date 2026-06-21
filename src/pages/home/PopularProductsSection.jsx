@@ -46,10 +46,13 @@ const PRODUCTS = [
 
 function ProductCard({ img, name, detail, price, tags, clickable, productId }) {
   const navigate = useNavigate()
+
   return (
     <div
+      data-guide-id={name === '비노트' ? 'vinote-card' : undefined}
       onClick={() => clickable && navigate(`/product-detail/${productId || name}`)}
       style={{
+        position: 'relative',
         width: 120,
         borderRadius: 12,
         backgroundColor: '#FFFFFF',
@@ -71,7 +74,8 @@ function ProductCard({ img, name, detail, price, tags, clickable, productId }) {
         />
       </div>
 
-      {/* 텍스트 영역 */}
+
+{/* 텍스트 영역 */}
       <div
         style={{
           flex: 1,

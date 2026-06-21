@@ -1,6 +1,10 @@
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
 import AppLayout      from './components/layout/AppLayout'
+import { GuideProvider } from './context/GuideContext'
+import GuideCard      from './components/guide/GuideCard'
+import GuideHighlight from './components/guide/GuideHighlight'
 import HomePage       from './pages/home/HomePage'
 import MyPage         from './pages/mypage/MyPage'
 import ProfilePage    from './pages/mypage/ProfilePage'
@@ -17,32 +21,45 @@ import OnboardingPhotoPage    from './pages/onboarding/OnboardingPhotoPage'
 import OnboardingSkinCheckPage  from './pages/onboarding/OnboardingSkinCheckPage'
 import OnboardingLifestylePage  from './pages/onboarding/OnboardingLifestylePage'
 
-export default function App() {
+function AppContent() {
   const [showSplash, setShowSplash] = useState(false)
+  const location = useLocation()
 
   return (
-    <BrowserRouter>
+    <GuideProvider>
       {showSplash && <SplashPage onDismiss={() => setShowSplash(false)} />}
-      <Routes>
-        <Route element={<AppLayout />}>
-          <Route index           element={<HomePage />} />
-          <Route path="category" element={<ComingSoonPage title="곧 만나요!" subtitle="카테고리 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
-          <Route path="miyubot"  element={<MiyubotPage />} />
-          <Route path="liked"    element={<ComingSoonPage title="곧 만나요!" subtitle="좋아요 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
-          <Route path="mypage"   element={<MyPage />} />
-          <Route path="mypage/profile"   element={<ProfilePage />} />
-          <Route path="mypage/my-beauty"  element={<MyBeautyPage />} />
-          <Route path="mypage/skin-data" element={<SkinDataPage />} />
-        </Route>
-        {/* 독립 전체화면 페이지 (AppLayout 없음) */}
-        <Route path="onboarding" element={<OnboardingPhotoPage />} />
-        <Route path="onboarding/skin-check" element={<OnboardingSkinCheckPage />} />
-        <Route path="onboarding/lifestyle"  element={<OnboardingLifestylePage />} />
-        <Route path="ai-demo" element={<AiDemoPage />} />
-        <Route path="camera"  element={<CameraPage />} />
-        <Route path="product-detail/:productId" element={<ProductDetailPage />} />
-        <Route path="product-review/:productId" element={<ProductReviewPage />} />
-      </Routes>
+      <AnimatePresence>
+        <Routes location={location} key={location.pathname}>
+          <Route element={<AppLayout />}>
+            <Route index           element={<HomePage />} />
+            <Route path="category" element={<ComingSoonPage title="곧 만나요!" subtitle="카테고리 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
+            <Route path="miyubot"  element={<MiyubotPage />} />
+            <Route path="liked"    element={<ComingSoonPage title="곧 만나요!" subtitle="좋아요 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
+            <Route path="mypage"   element={<MyPage />} />
+            <Route path="mypage/profile"   element={<ProfilePage />} />
+            <Route path="mypage/my-beauty"  element={<MyBeautyPage />} />
+            <Route path="mypage/skin-data" element={<SkinDataPage />} />
+          </Route>
+          {/* 독립 전체화면 페이지 (AppLayout 없음) */}
+          <Route path="onboarding" element={<OnboardingPhotoPage />} />
+          <Route path="onboarding/skin-check" element={<OnboardingSkinCheckPage />} />
+          <Route path="onboarding/lifestyle"  element={<OnboardingLifestylePage />} />
+          <Route path="ai-demo" element={<AiDemoPage />} />
+          <Route path="camera"  element={<CameraPage />} />
+          <Route path="product-detail/:productId" element={<ProductDetailPage />} />
+          <Route path="product-review/:productId" element={<ProductReviewPage />} />
+        </Routes>
+      </AnimatePresence>
+      <GuideCard />
+      <GuideHighlight />
+    </GuideProvider>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   )
 }

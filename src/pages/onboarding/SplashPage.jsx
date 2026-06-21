@@ -1,52 +1,21 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import logoMain from '../../assets/logo/logo-main.svg'
 import logoWordmark from '../../assets/logo/logo-wordmark.svg'
 
 export default function SplashPage({ onDismiss }) {
   const navigate = useNavigate()
-  const [progress, setProgress] = useState(0)
-  const [fading, setFading] = useState(false)
-  const rafRef = useRef(null)
-
-  useEffect(() => {
-    const duration = 2200
-    let startTime = null
-
-    const animate = (timestamp) => {
-      if (!startTime) startTime = timestamp
-      const elapsed = timestamp - startTime
-      const p = Math.min(elapsed / duration, 1)
-      const ease = 1 - Math.pow(1 - p, 2)
-      setProgress(ease * 88)
-      if (p < 1) rafRef.current = requestAnimationFrame(animate)
-    }
-
-    rafRef.current = requestAnimationFrame(animate)
-
-    const fadeTimer = setTimeout(() => {
-      setFading(true)
-      const completed = localStorage.getItem('onboarding_completed')
-      const dest = completed ? '/' : '/onboarding'
-      setTimeout(() => {
-        onDismiss()
-        navigate(dest, { replace: true })
-      }, 380)
-    }, 2500)
-
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      clearTimeout(fadeTimer)
-    }
-  }, [onDismiss, navigate])
+  const progress = 55
+  const fading = false
 
   return (
     <div
       style={{
-        position: 'fixed',
+        position: 'absolute',
         inset: 0,
         zIndex: 9999,
-        background: 'linear-gradient(180deg, #FFFFFF 0%, #F0E9FF 100%)',
+        backgroundColor: '#FFFFFF',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -55,79 +24,105 @@ export default function SplashPage({ onDismiss }) {
         fontFamily: "'SUIT', sans-serif",
       }}
     >
-      {/* Center content */}
+      {/* Logo + text block */}
       <div
         style={{
-          flex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: 0,
-          paddingBottom: 48,
+          paddingTop: 160,
         }}
       >
+        {/* 3D rotating logo orb */}
+        <div style={{ perspective: '900px' }}>
+          <motion.img
+            src={logoMain}
+            alt="miyu"
+            animate={{
+              rotateY: [-20, 20],
+              y: [0, -8],
+              scale: [1, 1.03],
+            }}
+            transition={{
+              duration: 5,
+              ease: 'easeInOut',
+              repeat: Infinity,
+              repeatType: 'mirror',
+            }}
+            style={{
+              width: 240,
+              height: 240,
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
+        </div>
+
         {/* Tagline */}
         <p
           style={{
-            fontSize: 18,
-            fontWeight: 600,
-            background: 'linear-gradient(90deg, #6633CC 0%, #A17CF0 100%)',
+            fontSize: 26,
+            fontWeight: 500,
+            background: 'linear-gradient(135deg, #B38BFF 0%, #A1B0FF 50%, #D4B8FF 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
             margin: 0,
-            marginBottom: 28,
+            marginTop: 40,
             letterSpacing: '-0.02em',
-            lineHeight: 1,
+            lineHeight: 1.4,
+            textAlign: 'center',
           }}
         >
           당신만을 위한 피부 전문가
         </p>
 
-        {/* 3D Ring Logo */}
-        <img
-          src={logoMain}
-          alt="miyu"
-          style={{ width: 220, height: 220, objectFit: 'contain' }}
-        />
-
         {/* Wordmark */}
         <img
           src={logoWordmark}
           alt="miyu"
-          style={{ width: 110, height: 'auto', marginTop: 20, filter: 'brightness(0) saturate(0) opacity(0.55)' }}
+          style={{
+            width: 160,
+            height: 68,
+            objectFit: 'contain',
+            marginTop: 20,
+            filter: 'brightness(0) saturate(0) opacity(0.733)',
+          }}
         />
-      </div>
 
-      {/* Bottom area */}
-      <div
-        style={{
-          width: '100%',
-          paddingBottom: 48,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 18,
-        }}
-      >
+        {/* Sub text */}
         <p
           style={{
             fontSize: 13,
             fontWeight: 400,
             color: '#9D9AA3',
             textAlign: 'center',
-            lineHeight: 1.65,
+            lineHeight: 1.7,
             margin: 0,
+            marginTop: 14,
+            letterSpacing: '-0.01em',
           }}
         >
           나의 피부를 가장 잘 이해하는<br />개인 맞춤형 AI 뷰티 커머스
         </p>
+      </div>
 
-        {/* Progress bar */}
+      {/* Spacer */}
+      <div style={{ flex: 1 }} />
+
+      {/* Loading bar */}
+      <div
+        style={{
+          width: '100%',
+          paddingLeft: 28,
+          paddingRight: 28,
+          paddingBottom: 60,
+          boxSizing: 'border-box',
+        }}
+      >
         <div
           style={{
-            width: 'calc(100% - 48px)',
+            width: '100%',
             height: 2,
             borderRadius: 99,
             backgroundColor: '#E3D4FD',

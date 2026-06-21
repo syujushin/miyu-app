@@ -146,6 +146,8 @@ export default function SkinReportCard() {
 
   return (
     <div
+      data-guide-id="skin-report"
+      onClick={() => navigate('/mypage/my-beauty')}
       style={{
         position: 'relative',
         height: 220,
@@ -159,23 +161,20 @@ export default function SkinReportCard() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+        cursor: 'pointer',
       }}
     >
-      <button
-        onClick={() => navigate('/mypage/my-beauty')}
+      <div
         style={{
           position: 'absolute',
           top: 20,
           right: 20,
-          padding: 0,
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
           lineHeight: 0,
         }}
       >
         <img src={chevronIcon} alt="더보기" style={{ width: 12, height: 24, display: 'block' }} />
-      </button>
+      </div>
+
 
       <div style={{ paddingRight: 24 }}>
         <p style={{ fontSize: 18, fontWeight: 600, color: '#242227', lineHeight: 1.4, margin: 0 }}>

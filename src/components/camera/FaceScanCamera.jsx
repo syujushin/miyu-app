@@ -56,9 +56,9 @@ export function CamFaceMesh({ scanProgress }) {
     >
       <defs>
         <linearGradient id="cam-scan-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#A17CF0" stopOpacity="0" />
-          <stop offset="50%"  stopColor="#7733FF" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#A17CF0" stopOpacity="0" />
+          <stop offset="0%"   stopColor="#F0E9FF" stopOpacity="0" />
+          <stop offset="50%"  stopColor="#F0E9FF" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="#F0E9FF" stopOpacity="0" />
         </linearGradient>
         <radialGradient id="mesh-inner-glow" cx="50%" cy="42%" r="55%">
           <stop offset="0%"   stopColor="#C0A3F7" stopOpacity="0.22" />
@@ -87,8 +87,8 @@ export function CamFaceMesh({ scanProgress }) {
 
       {scanY !== null && (
         <>
-          <rect x="0" y={scanY - 10} width={CAM_VB_W} height={20} fill="url(#cam-scan-grad)" />
-          <line x1="0" y1={scanY} x2={CAM_VB_W} y2={scanY} stroke="#B08FF4" strokeWidth="1.5" opacity="0.9" />
+          <rect x="0" y={scanY - 5} width={CAM_VB_W} height={10} fill="url(#cam-scan-grad)" />
+          <line x1="0" y1={scanY} x2={CAM_VB_W} y2={scanY} stroke="#F0E9FF" strokeWidth="0.6" opacity="0.5" />
         </>
       )}
     </svg>
@@ -96,10 +96,11 @@ export function CamFaceMesh({ scanProgress }) {
 }
 
 export function CameraOverlay({ onCapture, onClose }) {
-  const videoRef  = useRef(null)
-  const canvasRef = useRef(null)
-  const streamRef = useRef(null)
-  const rafRef    = useRef(null)
+  const videoRef       = useRef(null)
+  const canvasRef      = useRef(null)
+  const streamRef      = useRef(null)
+  const rafRef         = useRef(null)
+  const capturedRef    = useRef(null)
   const [phase,        setPhase]        = useState('init')
   const [scanProgress, setScanProgress] = useState(null)
 
@@ -126,7 +127,7 @@ export function CameraOverlay({ onCapture, onClose }) {
     if (phase !== 'camera') return
     setPhase('scanning')
     setScanProgress(0)
-    const DURATION = 2500
+    const DURATION = 3500
     const start = performance.now()
     const tick = (now) => {
       const p = Math.min(((now - start) / DURATION) * 100, 100)
@@ -150,9 +151,14 @@ export function CameraOverlay({ onCapture, onClose }) {
       ctx.drawImage(video, 0, 0)
       dataUrl = canvas.toDataURL('image/jpeg', 0.88)
     }
-    streamRef.current?.getTracks().forEach(t => t.stop())
     setScanProgress(null)
-    onCapture(dataUrl)
+    capturedRef.current = dataUrl
+    setPhase('analyzing')
+    // 스트림은 navigate 직전에 끊어야 카메라 화면 유지됨
+    setTimeout(() => {
+      streamRef.current?.getTracks().forEach(t => t.stop())
+      onCapture(capturedRef.current)
+    }, 1600)
   }
 
   if (phase === 'error') {
@@ -212,7 +218,8 @@ export function CameraOverlay({ onCapture, onClose }) {
         </div>
       )}
 
-      {(phase === 'camera' || phase === 'scanning') && <CamFaceMesh scanProgress={scanProgress} />}
+
+      {(phase === 'camera' || phase === 'scanning' || phase === 'analyzing') && <CamFaceMesh scanProgress={scanProgress} />}
 
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10,
@@ -222,7 +229,7 @@ export function CameraOverlay({ onCapture, onClose }) {
         <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block', filter: 'invert(1)' }} />
         <div style={{ height: 52, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingLeft: 16, paddingRight: 16 }}>
           <p style={{ fontSize: 17, fontWeight: 600, color: '#FFFFFF', letterSpacing: '-0.01em' }}>
-            {phase === 'scanning' ? 'AI 분석 중' : '피부 스캔'}
+            {phase === 'scanning' || phase === 'analyzing' ? 'AI 분석 중' : '피부 스캔'}
           </p>
         </div>
       </div>
@@ -235,25 +242,33 @@ export function CameraOverlay({ onCapture, onClose }) {
       </button>
 
       {phase === 'scanning' && (
-        <div style={{ position: 'absolute', top: 110, left: '50%', transform: 'translateX(-50%)', background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 99, padding: '7px 18px', border: '1px solid rgba(161,124,240,0.4)', whiteSpace: 'nowrap', zIndex: 10 }}>
-          <span style={{ color: '#B08FF4', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>
+        <div style={{ position: 'absolute', top: 110, left: '50%', transform: 'translateX(-50%)', background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', borderRadius: 99, padding: '7px 18px', border: '1px solid rgba(206,183,250,0.5)', whiteSpace: 'nowrap', zIndex: 10 }}>
+          <span style={{ color: '#8257E0', fontSize: 14, fontWeight: 600, letterSpacing: '-0.01em' }}>
             스캔 중... {Math.round(scanProgress ?? 0)}%
           </span>
         </div>
       )}
 
-      <div style={{
+      {(phase === 'camera' || phase === 'scanning' || phase === 'analyzing') && <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 10,
         paddingBottom: 52, paddingTop: 36,
         background: 'linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%)',
       }}>
-        {phase === 'scanning' ? (
-          <div style={{ paddingLeft: 36, paddingRight: 36 }}>
-            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, textAlign: 'center', marginBottom: 14 }}>얼굴을 움직이지 말고 기다려주세요</p>
-            <div style={{ height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
-              <div style={{ width: `${scanProgress ?? 0}%`, height: '100%', borderRadius: 99, background: 'linear-gradient(90deg, #7733FF, #A17CF0)', transition: 'width 0.05s linear' }} />
+        {phase === 'analyzing' ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 28 }}>
+            <div style={{ display: 'flex', gap: 5 }}>
+              <span className="dot-1" style={{ background: '#CEB7FA' }} />
+              <span className="dot-2" style={{ background: '#CEB7FA' }} />
+              <span className="dot-3" style={{ background: '#CEB7FA' }} />
             </div>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 15, fontWeight: 600, margin: 0, letterSpacing: '-0.01em' }}>
+              분석 중...
+            </p>
           </div>
+        ) : phase === 'scanning' ? (
+          <p style={{ color: '#FFFFFF', fontSize: 15, textAlign: 'center', margin: 0, marginBottom: 28 }}>
+            얼굴을 움직이지 말고 기다려주세요
+          </p>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <p style={{ fontSize: 14, fontWeight: 400, color: 'rgba(255,255,255,0.62)', letterSpacing: '-0.01em' }}>얼굴을 타원 안에 맞춰주세요</p>
@@ -275,7 +290,7 @@ export function CameraOverlay({ onCapture, onClose }) {
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       <canvas ref={canvasRef} style={{ display: 'none' }} />
     </div>
