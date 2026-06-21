@@ -190,10 +190,10 @@ export default function ProductReviewPage() {
   const currentReviews = skinMatchOn ? REVIEWS_MATCHED : REVIEWS_ALL
 
   const chipStyle = (active) => ({
-    padding: '7px 14px', borderRadius: 8,
-    border: active ? '1.5px solid #6633CC' : '1.5px solid #DAD8DE',
-    backgroundColor: '#FFFFFF', color: active ? '#6633CC' : '#78757D',
-    fontSize: 14, fontWeight: active ? 600 : 400,
+    padding: '5px 10px', borderRadius: 8,
+    border: active ? '1px solid #8257E0' : '1px solid #F0EFF3',
+    backgroundColor: '#FFFFFF', color: active ? '#8257E0' : '#9D9AA3',
+    fontSize: 13, fontWeight: active ? 500 : 400, lineHeight: 1.4,
     cursor: 'pointer', letterSpacing: '-0.01em', whiteSpace: 'nowrap',
   })
 
@@ -253,27 +253,27 @@ export default function ProductReviewPage() {
         {/* AI 분석 카드 */}
         <motion.div variants={fadeUp} style={{ backgroundColor: skinMatchOn ? '#FDFAFF' : '#FAFAFA', borderRadius: 16, marginTop: 0, marginLeft: 20, marginRight: 20, marginBottom: 12, padding: 20, display: 'flex', flexDirection: 'column', gap: 12, border: '1px solid #F6F2FF' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <img src={miyuLogo} alt="미유" style={{ width: 22, height: 22, display: 'block', flexShrink: 0 }} />
-            <span style={{ fontSize: 18, fontWeight: 600, color: '#242227', lineHeight: 1 }}>
+            <img src={miyuLogo} alt="미유" style={{ width: 20, height: 20, display: 'block', flexShrink: 0 }} />
+            <span style={{ fontSize: 16, fontWeight: 600, color: '#242227', lineHeight: 1 }}>
               {skinMatchOn ? '구르님과 비슷한 피부타입 리뷰 분석' : '전체 피부타입 리뷰 분석'}
             </span>
           </div>
 
           {skinMatchOn ? (
             <>
-              <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
                 구르님 피부에는 <span style={{ color: '#9169EB' }}>데일리 진정·속보습용 세럼</span>으로 적합해요. 꾸준히 사용했을 때 피부가 한결 편안해졌다는 후기가 많고, 자극 없이 사용 가능해 민감한 날에도 부담이 적어요.
               </p>
-              <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
                 <span style={{ color: '#9169EB' }}>가벼운 제형으로 메이크업 전에 잘 어울려요.</span> 화장이 밀리지 않고 베이스가 잘 먹는다는 평가가 많아요.
               </p>
             </>
           ) : (
             <>
-              <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
                 전반적으로 <span style={{ color: '#9169EB' }}>무겁지 않은데 촉촉하다</span>는 평이 많아요. 리치한 제형을 꺼리는 지성 피부와, 속건조를 잡고 싶어하는 건성 피부 모두를 만족시킨 황금 밸런스라는 평이에요.
               </p>
-              <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: 15, fontWeight: 400, color: '#5F5C66', lineHeight: 1.5, margin: 0 }}>
                 특히 예민한 피부를 가진 분들도 트러블 반응 없이 한 통을 다 비웠다는 <span style={{ color: '#9169EB' }}>순한 사용감</span>에 만족감을 드러내고 있어요.
               </p>
             </>
@@ -356,23 +356,38 @@ export default function ProductReviewPage() {
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 50, backgroundColor: '#FFFFFF', borderRadius: '20px 20px 0 0', maxHeight: '85%', display: 'flex', flexDirection: 'column' }}>
             <div style={{ width: 40, height: 4, borderRadius: 99, backgroundColor: '#DAD8DE', margin: '12px auto 0' }} />
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px 8px' }}>
-              <p style={{ fontSize: 19, fontWeight: 600, color: '#242227', margin: 0 }}>필터</p>
+              <p style={{ fontSize: 18, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1 }}>필터</p>
               <button onClick={resetFilters} style={{ fontSize: 13, fontWeight: 500, color: '#9D9AA3', background: 'none', border: 'none', cursor: 'pointer' }}>초기화</button>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 20px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 20px' }}>
               {FILTER_CONFIG.map(({ key, label, options }) => (
                 <div key={key} style={{ marginBottom: 20 }}>
-                  <p style={{ fontSize: 14, fontWeight: 600, color: '#242227', margin: '0 0 10px' }}>{label}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                    {options.map(opt => (
-                      <button key={opt} onClick={() => toggle(key, opt)} style={chipStyle(isSelected(key, opt))}>{opt}</button>
-                    ))}
-                  </div>
+                  <p style={{ fontSize: 14, fontWeight: 500, color: '#242227', margin: '0 0 10px', lineHeight: 1.5 }}>{label}</p>
+                  {key === 'tone' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        {options.slice(0, 3).map(opt => (
+                          <button key={opt} onClick={() => toggle(key, opt)} style={chipStyle(isSelected(key, opt))}>{opt}</button>
+                        ))}
+                      </div>
+                      <div style={{ display: 'flex', gap: 6 }}>
+                        {options.slice(3).map(opt => (
+                          <button key={opt} onClick={() => toggle(key, opt)} style={chipStyle(isSelected(key, opt))}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {options.map(opt => (
+                        <button key={opt} onClick={() => toggle(key, opt)} style={chipStyle(isSelected(key, opt))}>{opt}</button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-            <div style={{ padding: '12px 20px 28px', borderTop: '1px solid #F0EFF3' }}>
-              <button onClick={() => setShowFilter(false)} style={{ width: '100%', height: 52, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 16, fontWeight: 600 }}>
+            <div style={{ padding: '16px 20px 32px', borderTop: '1px solid #F0EFF3' }}>
+              <button onClick={() => setShowFilter(false)} style={{ width: '100%', height: 50, borderRadius: 12, backgroundColor: '#6633CC', border: 'none', cursor: 'pointer', color: '#FFFFFF', fontSize: 16, fontWeight: 600 }}>
                 적용하기
               </button>
             </div>

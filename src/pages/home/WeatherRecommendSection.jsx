@@ -76,7 +76,7 @@ export default function WeatherRecommendSection() {
       : '서울 날씨 정보 없음'
 
   return (
-    <div>
+    <div data-guide-id="weather-section">
       {/* 섹션 헤더 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingLeft: 16, paddingRight: 16, marginBottom: 16 }}>
         {/* 날씨 아이콘 (주/야간 구분, Meteocons 내장 애니메이션) */}

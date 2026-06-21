@@ -57,7 +57,7 @@ export default function ReviewCard({ id, user, badge, time, tags, rating, image,
       )}
 
       {/* 리뷰 텍스트 */}
-      <p style={{ fontSize: 16, fontWeight: 400, color: '#5F5C66', margin: '0 0 20px', lineHeight: 1.5, whiteSpace: 'pre-line' }}>{text}</p>
+      <p style={{ fontSize: 15, fontWeight: 400, color: '#5F5C66', margin: '0 0 20px', lineHeight: 1.5, whiteSpace: 'pre-line' }}>{text}</p>
 
       {/* 반응 버튼 */}
       <div style={{ display: 'flex', gap: 6 }}>
@@ -72,10 +72,10 @@ export default function ReviewCard({ id, user, badge, time, tags, rating, image,
               key={label}
               onClick={() => toggleReaction?.(id, label)}
               style={{
-                padding: '7px 14px', borderRadius: 8, border: 'none',
+                padding: '6px 12px', borderRadius: 8, border: 'none',
                 background: '#FFFFFF',
-                boxShadow: active ? 'inset 0 0 0 1.5px #B08FF4' : 'inset 0 0 0 1px #DAD8DE',
-                fontSize: 14, lineHeight: 1.5, cursor: 'pointer',
+                boxShadow: active ? 'inset 0 0 0 1.5px #B08FF4' : 'inset 0 0 0 1px #F0EFF3',
+                fontSize: 13, lineHeight: 1.5, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0,
               }}
             >

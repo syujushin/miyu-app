@@ -1,48 +1,59 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { useLocation } from 'react-router-dom'
 
 const GuideContext = createContext(null)
 
 export const GUIDE_STEPS = [
-  { id: 'skin',    message: '피부 점수를 눌러 상세 분석을 확인해보세요',           highlight: 'skin-report'  },
-  { id: 'vinote',  message: '비노트 제품을 선택해보세요',                        highlight: 'vinote-card'  },
-  { id: 'weather', message: '현재 날씨를 기반으로 아이템을 추천해줘요',               highlight: 'weather-cards' },
-  { id: 'miyubot', message: '미유봇에게 자유롭게 질문해보세요. 진짜 AI가 답해요', highlight: 'miyubot-nav'  },
-  { id: 'explore', message: '홈 화면을 자유롭게 둘러보세요',                    highlight: null           },
+  {
+    id: 'skin',
+    title: '마이 루틴 확인하기',
+    message: '오늘 루틴을 확인하고 하나씩 체크해보세요.\n꾸준히 관리할수록 피부가 달라집니다.',
+    highlight: 'skin-report',
+  },
+  {
+    id: 'vinote',
+    title: '맞춤 제품 선택하기',
+    message: '제품을 선택하면 상세 페이지에서\n내 피부와의 적합도를 확인할 수 있어요.',
+    highlight: 'vinote-card',
+  },
+  {
+    id: 'weather',
+    title: '날씨 기반 제품 추천',
+    message: '오늘 날씨와 피부 상태를 함께 분석해\n적절한 아이템을 추천해드려요.',
+    highlight: 'weather-section',
+  },
+  {
+    id: 'miyubot',
+    title: '미유봇 AI 상담',
+    message: '자유롭게 질문해보세요. 진짜 AI가 내 피부에\n딱 맞는 제품과 루틴을 찾아줘요.',
+    highlight: 'miyubot-nav',
+  },
 ]
 
 export function GuideProvider({ children }) {
   const [step, setStep] = useState(0)
+  const [finished, setFinished] = useState(false)
+  const [started, setStarted] = useState(false)
   const location = useLocation()
-  const timerRef = useRef(null)
-  const prevPathRef = useRef(location.pathname)
 
-  const nextStep = useCallback(() => {
-    setStep(s => (s + 1) % GUIDE_STEPS.length)
+  const startGuide = useCallback(() => {
+    setStep(0)
+    setFinished(false)
+    setStarted(true)
   }, [])
 
-  // Auto-advance after 5s
-  useEffect(() => {
-    clearTimeout(timerRef.current)
-    timerRef.current = setTimeout(nextStep, 5000)
-    return () => clearTimeout(timerRef.current)
-  }, [step, nextStep])
+  const next = useCallback(() => {
+    if (step >= GUIDE_STEPS.length - 1) setFinished(true)
+    else setStep(s => s + 1)
+  }, [step])
 
-  // 홈에서 다른 화면으로 이동할 때 즉시 다음 단계
-  useEffect(() => {
-    const from = prevPathRef.current
-    prevPathRef.current = location.pathname
-    if (from === '/' && location.pathname !== '/') {
-      clearTimeout(timerRef.current)
-      nextStep()
-    }
-  }, [location.pathname, nextStep])
+  const skip = useCallback(() => setFinished(true), [])
 
+  const guideVisible = started && !finished && location.pathname === '/'
   const currentHighlight = GUIDE_STEPS[step]?.highlight ?? null
-  const guideVisible = location.pathname === '/'
 
   return (
-    <GuideContext.Provider value={{ step, currentHighlight, guideVisible }}>
+    <GuideContext.Provider value={{ step, currentHighlight, guideVisible, startGuide, next, skip }}>
       {children}
     </GuideContext.Provider>
   )

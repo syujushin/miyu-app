@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import BottomNavigation from './BottomNavigation'
 import WeatherBanner    from './WeatherBanner'
+import { useGuide }     from '../../context/GuideContext'
+import GuideFAB         from '../guide/GuideFAB'
 
 const NAV_HEIGHT = 87
 
@@ -26,6 +28,37 @@ export default function AppLayout() {
   const prevPath   = useRef(pathname)
   const [animKey,   setAnimKey]   = useState(0)
   const [animClass, setAnimClass] = useState('')
+  const { guideVisible, step, currentHighlight } = useGuide()
+  const scrollRef = useRef(null)
+  const prevGuideVisible = useRef(guideVisible)
+
+  useLayoutEffect(() => {
+    if (!guideVisible || !scrollRef.current) return
+    const container = scrollRef.current
+
+    if (currentHighlight !== 'weather-section') {
+      container.scrollTop = 0
+      return
+    }
+
+    const el = document.querySelector('[data-guide-id="weather-section"]')
+    if (!el) return
+
+    const containerRect = container.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+
+    const elAbsoluteBottom = elRect.bottom - containerRect.top + container.scrollTop
+    container.scrollTop = Math.max(0, elAbsoluteBottom - containerRect.height + 60)
+  }, [guideVisible, step, currentHighlight])
+
+  // 가이드 종료 시 콘텐츠 리마운트 → stagger 애니메이션 재생
+  useEffect(() => {
+    if (prevGuideVisible.current && !guideVisible) {
+      setAnimClass('')
+      setAnimKey(k => k + 1)
+    }
+    prevGuideVisible.current = guideVisible
+  }, [guideVisible])
 
   useEffect(() => {
     if (prevPath.current !== pathname) {
@@ -39,9 +72,10 @@ export default function AppLayout() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflowX: 'hidden' }}>
       <main style={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
         <div
+          ref={scrollRef}
           key={animKey}
-          className={animClass}
-          style={{ height: '100%', overflowY: 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
+          className={`${animClass}${guideVisible ? ' guide-active' : ''}`}
+          style={{ height: '100%', overflowY: guideVisible ? 'hidden' : 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           <Outlet />
         </div>
@@ -53,6 +87,7 @@ export default function AppLayout() {
         </div>
       )}
 
+      <GuideFAB bottom={showBanner && pathname !== '/miyubot' && !pathname.startsWith('/mypage') ? 131 : 103} />
       {pathname !== '/miyubot' && <BottomNavigation />}
     </div>
   )

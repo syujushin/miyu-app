@@ -26,6 +26,7 @@ export default function BottomNavigation() {
         width: '100%',
         flexShrink: 0,
         backgroundColor: '#FFFFFF',
+        borderTop: '1px solid #F0EFF3',
       }}
     >
       {/* 탭 영역: 상단 4px 여백, 좌20 + 5×48 + 4×27.5 + 우20 = 390 */}

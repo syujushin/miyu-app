@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 
 import logoMain     from '../../assets/logo/Top/Logo.svg'
 import logoIcon     from '../../assets/logo/logo-icon-square.svg'
@@ -86,6 +87,11 @@ function StarRow({ rating, size = 14, fillColor = '#6633CC', emptyColor = '#9169
 export default function ProductDetailPage() {
   const navigate = useNavigate()
   const [heroSlide, setHeroSlide] = useState(0)
+  const [barFill, setBarFill] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setBarFill(true), 300)
+    return () => clearTimeout(t)
+  }, [])
   const heroTouchStartX = useRef(null)
   const HERO_IMAGES = [imgHero, imgHero02, imgHero04, imgHero03]
 
@@ -176,7 +182,10 @@ export default function ProductDetailPage() {
       <div style={{ flex: 1, overflowY: 'auto' }}>
 
         {/* 제품 히어로 이미지 캐러셀 */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
           style={{ position: 'relative', width: '100%', height: 390, overflow: 'hidden', flexShrink: 0, touchAction: 'pan-y', userSelect: 'none' }}
           onTouchStart={e => { heroTouchStartX.current = e.touches[0].clientX }}
           onTouchEnd={e => {
@@ -207,10 +216,16 @@ export default function ProductDetailPage() {
               <div key={i} onClick={() => setHeroSlide(i)} style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: i === heroSlide ? '#9169EB' : '#F0EFF3', transition: 'background-color 0.25s ease', cursor: 'pointer' }} />
             ))}
           </div>
-        </div>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } } }}
+        >
 
         {/* ── 제품 기본 정보 ── */}
-        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }} style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {/* 브랜드 + 이름 + 가격 */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 16, fontWeight: 400, color: '#78757D', lineHeight: 1.4 }}>비노트</span>
@@ -221,50 +236,51 @@ export default function ProductDetailPage() {
             </span>
           </div>
           {/* 리뷰 행 */}
-          <button
-            onClick={() => navigate('/product-review/vinote')}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-          >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <StarRow rating={4.5} size={14} fillColor="#C0A3F7" emptyColor="#F0EFF3" gap={-2} />
             <span style={{ fontSize: 14, fontWeight: 600, color: '#C0A3F7', lineHeight: 1.7 }}>4.5</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto' }}>
+            <motion.div
+              onClick={() => navigate('/product-review/vinote')}
+              whileTap={{ scale: 0.97 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto', cursor: 'pointer' }}
+            >
               <span style={{ fontSize: 12, fontWeight: 400, color: '#9D9AA3', lineHeight: 1.5 }}>4,351개의 리뷰</span>
               <img src={chevronRight} alt="" style={{ width: 14, height: 14, display: 'block' }} />
-            </div>
-          </button>
-        </div>
+            </motion.div>
+          </div>
+        </motion.div>
 
         {/* 구분선 */}
-        <div style={{ height: 1, backgroundColor: '#F4F3F7' }} />
+        <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut' } } }} style={{ height: 1, backgroundColor: '#F4F3F7' }} />
 
         {/* ── 피부 적합도 ── */}
-        <div style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }} style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
           {/* 헤더 행: 로고 + 텍스트 + 퍼센트 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <img src={logoIcon} alt="miyu" style={{ width: 22, height: 22, borderRadius: 6, display: 'block', flexShrink: 0 }} />
-            <span style={{ fontSize: 18, fontWeight: 600, color: '#242227', lineHeight: 1, letterSpacing: '-0.01em' }}>
+            <img src={logoIcon} alt="miyu" style={{ width: 20, height: 20, borderRadius: 6, display: 'block', flexShrink: 0 }} />
+            <span style={{ fontSize: 16, fontWeight: 600, color: '#242227', lineHeight: 1, letterSpacing: '-0.01em' }}>
               구르님과의 피부 적합도
             </span>
-            <span style={{ fontSize: 20, color: '#6633CC', lineHeight: 1 }}>
-  <span style={{ fontWeight: 800 }}>98</span><span style={{ fontWeight: 700 }}>%</span>
-</span>
+            <span style={{ lineHeight: 1 }}>
+              <span style={{ fontSize: 18, fontWeight: 800, color: '#6633CC', lineHeight: 1 }}>98</span><span style={{ fontSize: 18, fontWeight: 700, color: '#6633CC', lineHeight: 1 }}>%</span>
+            </span>
           </div>
           {/* 프로그레스 바 — 전체 350×4, 채움 343×4 */}
           <div style={{ width: 350, height: 4, borderRadius: 99, backgroundColor: '#F0EFF3', overflow: 'hidden' }}>
-            <div style={{ width: 343, height: '100%', background: 'linear-gradient(90deg, #BB99FF, #7733FF)' }} />
+            <div style={{ width: barFill ? 343 : 0, height: '100%', background: 'linear-gradient(90deg, #BB99FF, #7733FF)', transition: 'width 0.6s cubic-bezier(0.25, 1, 0.5, 1)' }} />
           </div>
           {/* 설명 텍스트 */}
-          <p style={{ fontSize: 16, fontWeight: 400, color: '#78757D', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: 15, fontWeight: 400, color: '#78757D', margin: 0, lineHeight: 1.5 }}>
             피부 보습에 도움을 주는 35개의 성분과 수분 증발을 차단해주는 성분이 1개 포함되어 있어 구르님처럼 건성 피부에 적합한 제품입니다.<br />
             비슷한 피부 타입을 가진 다른 소비자들의 리뷰 평가도 4.5점 이상으로 구르님께 적합한 제품으로 예상됩니다.
           </p>
-        </div>
+        </motion.div>
 
         {/* 구분선 */}
-        <div style={{ height: 1, backgroundColor: '#F4F3F7' }} />
+        <motion.div variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.4, ease: 'easeOut' } } }} style={{ height: 1, backgroundColor: '#F4F3F7' }} />
 
         {/* ── 탭 바 ── */}
-        <div style={{ display: 'flex' }}>
+        <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }} style={{ display: 'flex' }}>
           {[{ key: 'info', label: '제품정보' }, { key: 'review', label: '리뷰' }].map(({ key, label }) => (
             <button
               key={key}
@@ -274,7 +290,7 @@ export default function ProductDetailPage() {
               {label}
             </button>
           ))}
-        </div>
+        </motion.div>
 
         {activeTab === 'info' && (
           <div style={{ padding: 16 }}>
@@ -405,6 +421,8 @@ export default function ProductDetailPage() {
             </div>
           </div>
         )}
+
+        </motion.div>
       </div>
 
       {/* ── 하단 구매 바 ── */}

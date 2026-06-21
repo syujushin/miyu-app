@@ -51,7 +51,7 @@ function Chip({ label, active, onToggle }) {
     <motion.button
       variants={chipVariants}
       animate={active ? 'active' : 'idle'}
-      whileTap={{ scale: 0.94 }}
+      whileTap={{ scale: 0.97 }}
       onClick={onToggle}
       style={chipBaseStyle(active)}
     >

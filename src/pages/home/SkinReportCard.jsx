@@ -4,6 +4,7 @@ import reportBg    from '../../assets/images/home/home-report-bg.png'
 import waterDrop   from '../../assets/images/home/home-water-drop.png'
 import chevronIcon from '../../assets/Icon/home-card-allow.svg'
 import useWeather  from '../../hooks/useWeather'
+import { useGuide } from '../../context/GuideContext'
 
 function getGreeting() {
   const h = new Date().getHours()
@@ -56,12 +57,14 @@ const glass = {
 }
 
 export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', barColor = '#7445D6', labelSize = 10, scoreSize = 16, barHeight = 2.5, rowGap = 2 }) {
-  const [ready, setReady] = useState(false)
+  const { guideVisible } = useGuide()
+  const [ready, setReady] = useState(guideVisible)
 
   useEffect(() => {
+    if (guideVisible) { setReady(true); return }
     const id = requestAnimationFrame(() => setReady(true))
     return () => cancelAnimationFrame(id)
-  }, [])
+  }, [guideVisible])
 
   return (
     <div
@@ -101,15 +104,17 @@ export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', b
 }
 
 function DonutChart({ score, size = 58 }) {
-  const [animated, setAnimated] = useState(0)
+  const { guideVisible } = useGuide()
   const sw = 3
   const r  = size / 2 - sw / 2
   const cx = size / 2
   const cy = size / 2
   const C  = 2 * Math.PI * r
+  const [animated, setAnimated] = useState(guideVisible ? (score / 100) * C : 0)
 
   useEffect(() => {
-    const target   = (score / 100) * C
+    const target = (score / 100) * C
+    if (guideVisible) { setAnimated(target); return }
     const duration = 900
     const start    = performance.now()
     const easeOut  = (t) => 1 - Math.pow(1 - t, 3)
@@ -119,7 +124,7 @@ function DonutChart({ score, size = 58 }) {
       if (t < 1) requestAnimationFrame(tick)
     }
     requestAnimationFrame(tick)
-  }, [score, C])
+  }, [score, C, guideVisible])
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -216,6 +221,7 @@ export default function SkinReportCard() {
         <MetricsCard metrics={metrics} />
 
         <div
+          data-guide-id="skin-score-card"
           style={{
             ...glass,
             display: 'flex',

@@ -4,12 +4,14 @@ import { useGuide } from '../../context/GuideContext'
 const STYLE_ID = 'miyu-guide-hl'
 
 export default function GuideHighlight() {
-  const { currentHighlight } = useGuide()
+  const { currentHighlight, guideVisible } = useGuide()
+  // 스포트라이트 오버레이가 하이라이트를 담당하므로 glow 비활성화
+  if (true) return null
 
   useEffect(() => {
     let el = document.getElementById(STYLE_ID)
 
-    if (!currentHighlight) {
+    if (!currentHighlight || !guideVisible) {
       el?.remove()
       return
     }

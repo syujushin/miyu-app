@@ -83,7 +83,7 @@ export default function SkinDataPage() {
         <button onClick={() => navigate(-1)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex' }}>
           <img src={arrowBack} alt="뒤로" style={{ width: 28, height: 28, display: 'block' }} />
         </button>
-        <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 17, fontWeight: 600, color: '#242227', letterSpacing: '-0.01em' }}>
+        <span style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', fontSize: 18, fontWeight: 500, color: '#242227', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
           나의 피부 데이터
         </span>
       </div>
