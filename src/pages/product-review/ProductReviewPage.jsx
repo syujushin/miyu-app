@@ -133,7 +133,7 @@ export default function ProductReviewPage() {
       .lv-banner-stroke {
         position: relative;
         overflow: hidden;
-        background: linear-gradient(to right, #B38BFF, #A1B0FF, #D4B8FF);
+        background: linear-gradient(to right, rgba(179,139,255,0.5), rgba(161,176,255,0.5), rgba(212,184,255,0.5));
       }
       .lv-banner-stroke::before {
         content: '';

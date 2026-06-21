@@ -36,11 +36,11 @@ function AppContent() {
             <Route path="miyubot"  element={<MiyubotPage />} />
             <Route path="liked"    element={<ComingSoonPage title="곧 만나요!" subtitle="좋아요 화면은 다음 업데이트에서 만나볼 수 있어요" />} />
             <Route path="mypage"   element={<MyPage />} />
-            <Route path="mypage/skin-data" element={<SkinDataPage />} />
           </Route>
           {/* 독립 전체화면 페이지 (AppLayout 없음) */}
           <Route path="mypage/profile"    element={<ProfilePage />} />
           <Route path="mypage/my-beauty"  element={<MyBeautyPage />} />
+          <Route path="mypage/skin-data"  element={<SkinDataPage />} />
           <Route path="onboarding" element={<OnboardingPhotoPage />} />
           <Route path="onboarding/skin-check" element={<OnboardingSkinCheckPage />} />
           <Route path="onboarding/lifestyle"  element={<OnboardingLifestylePage />} />

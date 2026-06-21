@@ -18,6 +18,19 @@ import imgToriden        from '../../assets/images/product/product-toner-toriden
 import imgEsnatureSerum  from '../../assets/images/product/product-serum-esnature.png'
 import imgEstra          from '../../assets/images/product/product-cream-estra.png'
 
+/* ── 현재 날짜/시간 포맷 ── */
+const DAYS = ['일', '월', '화', '수', '목', '금', '토']
+function formatNow() {
+  const now = new Date()
+  const m = now.getMonth() + 1
+  const d = now.getDate()
+  const day = DAYS[now.getDay()]
+  const h = now.getHours()
+  const ampm = h < 12 ? '오전' : '오후'
+  const h12 = h % 12 === 0 ? 12 : h % 12
+  return `${m}.${d} ${day} ${ampm} ${h12}시`
+}
+
 /* ── 애니메이션 variants ── */
 const stagger = {
   hidden: {},
@@ -69,21 +82,19 @@ const METRICS = [
   { label: '유분', score: 67 },
   { label: '탄력', score: 43 },
 ]
-const SKIN_TYPE_CHIPS  = ['복합성 피부', '건조함', '민감성', '모공']
-const EXCLUDE_CHIPS    = ['향료', '리모넨']
-const PERSONAL_CHIPS   = ['봄웜라이트', '살몬코랄', '로즈베이지']
 
 /* ── 루틴 데이터 ── */
 const ROUTINE_SECTIONS = [
   {
     tag: '☀️ 외출 전',
     items: [
-      { id: 1, img: imgToriden,       name: '토리든 다이브인 저분자 히알루론산 토너', desc: '화장솜에 충분히 적신 후 살살 닦아주세요', done: true },
+      { id: 1, img: imgToriden,       name: '토리든 다이브인 저분자 히알루론산 토너', desc: '화장솜에 충분히 적신 후 살살 닦아주세요', done: false },
       { id: 2, img: imgEsnatureSerum, name: '에스네이처 아쿠아 스쿠알란 세럼', desc: '충분히 흡수될 때까지 두드려주세요', done: false },
       { id: 3, img: imgEstra,         name: '에스트라 아토베리어365 크림', desc: '얇게 두드리면서 펴발라주세요', done: false },
     ],
   },
 ]
+
 
 /* ── 루틴 카드 ── */
 function RoutineCard() {
@@ -115,7 +126,6 @@ function RoutineCard() {
 
   return (
     <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '16px' }}>
-      {/* 카드 헤더 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <p style={{ fontSize: 15, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1.4 }}>루틴</p>
         <span onClick={() => setEditing(e => !e)} style={{ fontSize: 13, fontWeight: 500, color: '#9D9AA3', cursor: 'pointer' }}>
@@ -125,12 +135,41 @@ function RoutineCard() {
 
       {ROUTINE_SECTIONS.map((section, si) => (
         <div key={si}>
-          {/* 섹션 태그 */}
-          <p style={{ fontSize: 13, fontWeight: 500, color: '#242227', margin: '0 0 10px', lineHeight: 1.4 }}>
-            {section.tag}
-          </p>
+          <div style={{ position: 'relative', marginBottom: 12 }}>
+            <p style={{ fontSize: 13, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.4 }}>
+              {section.tag}
+            </p>
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                position: 'absolute',
+                top: -8,
+                right: 0,
+                zIndex: 10,
+                backgroundColor: '#E3D4FD',
+                borderRadius: 8,
+                padding: '6px 10px 7px',
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 500, color: '#242227', lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                순서대로 사용해 주세요.
+              </span>
+              <div style={{
+                position: 'absolute',
+                bottom: -6,
+                right: 12,
+                width: 0, height: 0,
+                borderLeft: '6px solid transparent',
+                borderRight: '6px solid transparent',
+                borderTop: '6px solid #E3D4FD',
+              }} />
+            </motion.div>
+          </div>
 
-          {/* 루틴 아이템 */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {items.map((item) => (
               <motion.div
@@ -168,9 +207,8 @@ function RoutineCard() {
         </div>
       ))}
 
-      {/* 제품 추가하기 버튼 */}
       <button style={{
-        width: '100%', height: 40, marginTop: 12,
+        width: '100%', height: 44, marginTop: 12,
         borderRadius: 8, border: '0.5px solid #6633CC',
         backgroundColor: 'transparent', cursor: 'pointer',
         fontSize: 15, fontWeight: 500, color: '#6633CC',
@@ -218,19 +256,6 @@ function DonutChart({ score, size = 80, id = 'skinGrad' }) {
         </linearGradient>
       </defs>
     </svg>
-  )
-}
-
-/* ── 칩 ── */
-function Chip({ label, color = '#6633CC', bg = '#F0E9FF' }) {
-  return (
-    <span style={{
-      fontSize: 13, fontWeight: 400, color,
-      backgroundColor: bg, borderRadius: 99,
-      padding: '4px 12px', lineHeight: 1.5,
-    }}>
-      {label}
-    </span>
   )
 }
 
@@ -291,6 +316,7 @@ export default function MyBeautyPage() {
   }, [deviceBurst])
   const deleteDevice = (id) => setDeviceItems(prev => prev.filter(i => i.id !== id))
 
+
   return (
     <div style={{ backgroundColor: '#F7F6F9', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       <img src={bgSvg} alt="" draggable={false} style={{ position: 'absolute', top: 0, left: 0, width: '100%', pointerEvents: 'none', zIndex: 0 }} />
@@ -321,7 +347,7 @@ export default function MyBeautyPage() {
             background: 'none', border: 'none', padding: 0, cursor: 'pointer',
           }}>
             <span style={{ fontSize: 18, fontWeight: 600, color: '#242227', letterSpacing: '-0.01em', lineHeight: 1 }}>
-              1.15 목 오전 7시
+              {formatNow()}
             </span>
             <img src={chevronRight} alt="" style={{ width: 18, height: 18, display: 'block', transform: 'rotate(90deg)' }} />
           </button>
@@ -355,7 +381,9 @@ export default function MyBeautyPage() {
         </motion.div>
 
         {/* ── 루틴 ── */}
-        <motion.div variants={fadeUp}><RoutineCard /></motion.div>
+        <motion.div variants={fadeUp}>
+          <RoutineCard />
+        </motion.div>
 
         {/* ── 물 섭취량 + 수면 시간 ── */}
         <motion.div variants={fadeUp} style={{ display: 'flex', gap: 8 }}>
@@ -500,6 +528,7 @@ export default function MyBeautyPage() {
 
       </motion.div>
       </div>
+
     </div>
   )
 }

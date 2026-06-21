@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import reportBg    from '../../assets/images/home/home-report-bg.png'
 import waterDrop   from '../../assets/images/home/home-water-drop.png'
@@ -58,7 +58,11 @@ const glass = {
 
 export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', barColor = '#7445D6', labelSize = 10, scoreSize = 16, barHeight = 2.5, rowGap = 2 }) {
   const { guideVisible, guideDone } = useGuide()
-  const skipAnim = guideVisible || guideDone
+  const prevGuideDoneRef = useRef(guideDone)
+  const justEndedRef = useRef(false)
+  if (!prevGuideDoneRef.current && guideDone) justEndedRef.current = true
+  prevGuideDoneRef.current = guideDone
+  const skipAnim = guideVisible || justEndedRef.current
   const [ready, setReady] = useState(skipAnim)
 
   useEffect(() => {
@@ -106,7 +110,11 @@ export function MetricsCard({ metrics, containerStyle, trackColor = '#FFFFFF', b
 
 function DonutChart({ score, size = 58 }) {
   const { guideVisible, guideDone } = useGuide()
-  const skipAnim = guideVisible || guideDone
+  const prevGuideDoneRef = useRef(guideDone)
+  const justEndedRef = useRef(false)
+  if (!prevGuideDoneRef.current && guideDone) justEndedRef.current = true
+  prevGuideDoneRef.current = guideDone
+  const skipAnim = guideVisible || justEndedRef.current
   const sw = 3
   const r  = size / 2 - sw / 2
   const cx = size / 2

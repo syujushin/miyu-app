@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import HomeHeader               from '../../components/layout/HomeHeader'
 import SkinReportCard           from './SkinReportCard'
 import CategorySection          from './CategorySection'
@@ -6,10 +7,17 @@ import MiyubotBanner            from './MiyubotBanner'
 import WeatherRecommendSection  from './WeatherRecommendSection'
 import PersonalRecommendSection from './PersonalRecommendSection'
 import TopReviewSection         from './TopReviewSection'
+import { useGuide }             from '../../context/GuideContext'
 
 export default function HomePage() {
+  const { guideDone } = useGuide()
+  const prevGuideDoneRef = useRef(guideDone)
+  const justEndedRef = useRef(false)
+  if (!prevGuideDoneRef.current && guideDone) justEndedRef.current = true
+  prevGuideDoneRef.current = guideDone
+
   return (
-    <div style={{ paddingBottom: 60 }}>
+    <div className={justEndedRef.current ? 'guide-done' : ''} style={{ paddingBottom: 60 }}>
       <div style={{ position: 'sticky', top: 0, zIndex: 30, backgroundColor: '#F4F3F7' }}>
         <HomeHeader />
       </div>

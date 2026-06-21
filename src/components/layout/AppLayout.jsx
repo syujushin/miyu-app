@@ -11,6 +11,7 @@ const TAB_ORDER = ['/', '/category', '/miyubot', '/liked', '/mypage']
 
 function getPageClass(from, to) {
   if (to === from) return ''
+  if (to === '/') return 'page-refresh'
   if (to.startsWith('/mypage') && !from.startsWith('/mypage')) return 'page-from-below'
   if (from.startsWith('/mypage') && !to.startsWith('/mypage')) return 'page-fade'
   if (to === '/miyubot' || from === '/miyubot') return 'page-fade'
@@ -64,7 +65,7 @@ useEffect(() => {
         <div
           ref={scrollRef}
           key={animKey}
-          className={`${animClass}${guideVisible ? ' guide-active' : ''}${guideDone ? ' guide-done' : ''}`}
+          className={`${animClass}${guideVisible ? ' guide-active' : ''}`}
           style={{ height: '100%', overflowY: guideVisible ? 'hidden' : 'auto', overscrollBehavior: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           <Outlet />

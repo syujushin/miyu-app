@@ -38,7 +38,7 @@ export default function GuideFAB({ bottom }) {
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 200,
-        boxShadow: '0 4px 16px rgba(102, 51, 204, 0.32)',
+        boxShadow: 'none',
         flexShrink: 0,
         transition: 'bottom 0.25s ease',
       }}
