@@ -64,15 +64,15 @@ export const MIYUBOT_GUIDE_STEPS = [
   },
   {
     id: 'mb-categories',
-    title: '버튼 하나로 바로 질문해요',
-    message: '카테고리를 선택하면\n주제에 맞는 질문을 바로 시작해요.',
+    title: '버튼으로 쉽게 질문해요',
+    message: '카테고리를 선택하면 질문 버튼이\n순서대로 이어져 상담을 도와드려요.',
     highlights: ['miyubot-cat-skincare', 'miyubot-cat-makeup', 'miyubot-cat-innerbeauty', 'miyubot-cat-device', 'miyubot-cat-diagnosis'],
     rx: 99, fixedW: 89, fixedH: 45, placement: 'above',
   },
   {
     id: 'mb-camera',
     title: '실제 화면을 촬영해보세요',
-    message: '촬영하면 AI가 즉시 피부를\n분석하고 솔루션을 드려요.',
+    message: 'AI가 즉시 피부를 분석하고\n진단 결과를 보여줘요.',
     highlight: 'miyubot-camera-btn',
     rx: 24, fixedW: 48, fixedH: 48,
   },
