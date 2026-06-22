@@ -19,7 +19,7 @@ const BEAUTY_ITEMS = [
   { label: '루틴 관리',       to: null },
   { label: '피부 재진단',     to: '/onboarding' },
 ]
-const CS_ITEMS     = ['FAQ', '1:1 문의', '앱 설정', { label: 'AI 데모', to: '/ai-demo' }]
+const CS_ITEMS     = ['FAQ', '1:1 문의', '앱 설정']
 
 function MenuItem({ label, to, navigate, guideId }) {
   return (
