@@ -3,7 +3,7 @@ import { useGuide } from '../../context/GuideContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 export default function GuideFAB({ bottom }) {
-  const { guideVisible, fabIntroVisible, startGuide, miyubotGuideVisible, startMiyubotGuide, cameraOpen, mypageGuideVisible, startMypageGuide } = useGuide()
+  const { guideVisible, fabIntroVisible, startGuide, miyubotGuideVisible, startMiyubotGuide, mbIntroSeen, cameraOpen, mypageGuideVisible, startMypageGuide, mpIntroSeen } = useGuide()
   const { pathname } = useLocation()
   const navigate = useNavigate()
 
@@ -23,8 +23,8 @@ export default function GuideFAB({ bottom }) {
     <motion.button
       data-guide-id="guide-fab"
       onClick={handleClick}
-      animate={fabIntroVisible ? { x: [0, -3, 3, -3, 3, 0] } : { x: 0 }}
-      transition={fabIntroVisible ? { duration: 0.6, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' } : {}}
+      animate={(fabIntroVisible || (isMiyubot && !mbIntroSeen) || (isMypage && !mpIntroSeen)) ? { x: [0, -3, 3, -3, 3, 0] } : { x: 0 }}
+      transition={(fabIntroVisible || (isMiyubot && !mbIntroSeen) || (isMypage && !mpIntroSeen)) ? { duration: 0.6, repeat: Infinity, repeatDelay: 1.2, ease: 'easeInOut' } : {}}
       style={{
         position: 'absolute',
         bottom,

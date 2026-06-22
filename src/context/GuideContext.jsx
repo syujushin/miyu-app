@@ -94,11 +94,13 @@ export function GuideProvider({ children }) {
   const [mbStep, setMbStep] = useState(0)
   const [mbStarted, setMbStarted] = useState(false)
   const [mbFinished, setMbFinished] = useState(false)
+  const [mbIntroSeen, setMbIntroSeen] = useState(false)
   const [cameraOpen, setCameraOpen] = useState(false)
 
   const [mpStep, setMpStep] = useState(0)
   const [mpStarted, setMpStarted] = useState(false)
   const [mpFinished, setMpFinished] = useState(false)
+  const [mpIntroSeen, setMpIntroSeen] = useState(false)
 
   const location = useLocation()
 
@@ -122,6 +124,7 @@ export function GuideProvider({ children }) {
     setMbStep(0)
     setMbStarted(true)
     setMbFinished(false)
+    setMbIntroSeen(true)
   }, [])
 
   const nextMiyubot = useCallback(() => {
@@ -131,7 +134,7 @@ export function GuideProvider({ children }) {
 
   const skipMiyubot = useCallback(() => setMbFinished(true), [])
 
-  const startMypageGuide = useCallback(() => { setMpStep(0); setMpStarted(true); setMpFinished(false) }, [])
+  const startMypageGuide = useCallback(() => { setMpStep(0); setMpStarted(true); setMpFinished(false); setMpIntroSeen(true) }, [])
   const nextMypage = useCallback(() => {
     if (mpStep >= MYPAGE_GUIDE_STEPS.length - 1) setMpFinished(true)
     else setMpStep(s => s + 1)
@@ -153,9 +156,9 @@ export function GuideProvider({ children }) {
     <GuideContext.Provider value={{
       step, currentHighlight, guideVisible, guideDone, fabIntroVisible,
       startGuide, dismissFabIntro, next, skip,
-      mbStep, miyubotGuideVisible, startMiyubotGuide, nextMiyubot, skipMiyubot,
+      mbStep, miyubotGuideVisible, startMiyubotGuide, nextMiyubot, skipMiyubot, mbIntroSeen,
       cameraOpen, setCameraOpen,
-      mpStep, mypageGuideVisible, startMypageGuide, nextMypage, skipMypage,
+      mpStep, mypageGuideVisible, startMypageGuide, nextMypage, skipMypage, mpIntroSeen,
     }}>
       {children}
     </GuideContext.Provider>

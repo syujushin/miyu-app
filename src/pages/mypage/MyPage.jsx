@@ -17,8 +17,9 @@ const BEAUTY_ITEMS = [
   { label: '마이 루틴',       to: '/mypage/my-beauty', guideId: 'mypage-my-routine' },
   { label: '나의 피부 데이터', to: '/mypage/skin-data', guideId: 'mypage-skin-data' },
   { label: '루틴 관리',       to: null },
+  { label: '피부 재진단',     to: '/onboarding' },
 ]
-const CS_ITEMS     = ['FAQ', '1:1 문의', '앱 설정']
+const CS_ITEMS     = ['FAQ', '1:1 문의', '앱 설정', { label: 'AI 데모', to: '/ai-demo' }]
 
 function MenuItem({ label, to, navigate, guideId }) {
   return (

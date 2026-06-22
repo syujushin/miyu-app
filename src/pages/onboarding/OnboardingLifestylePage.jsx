@@ -22,7 +22,7 @@ const fadeUp = {
 function RadioCard({ label, selected, onSelect }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.98 }}
+
       onClick={onSelect}
       style={{
         width: '100%',

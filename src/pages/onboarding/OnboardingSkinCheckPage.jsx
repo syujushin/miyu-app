@@ -40,10 +40,7 @@ function chipBaseStyle(active) {
 
 const chipVariants = {
   idle: { scale: 1 },
-  active: {
-    scale: [1, 1.1, 1],
-    transition: { duration: 0.28, ease: 'easeOut' },
-  },
+  active: { scale: 1 },
 }
 
 function Chip({ label, active, onToggle }) {
@@ -51,7 +48,7 @@ function Chip({ label, active, onToggle }) {
     <motion.button
       variants={chipVariants}
       animate={active ? 'active' : 'idle'}
-      whileTap={{ scale: 0.97 }}
+
       onClick={onToggle}
       style={chipBaseStyle(active)}
     >
