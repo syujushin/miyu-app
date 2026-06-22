@@ -31,6 +31,15 @@ import imgBanilacoBlusher from '../assets/images/product/product-blusher-banilac
 import imgEsnatureCream from '../assets/images/product/product-cream-esnature-squalane.webp'
 import imgDasiqueEye    from '../assets/images/product/product-eyeshadow-dasique-peachsqueeze.jpg'
 
+/* 이너뷰티 */
+import imgOmega3          from '../assets/images/product/omega3-rtg.png'
+import imgProbiotics      from '../assets/images/product/20b-probiotics-bio.jpg'
+import imgGlutathione     from '../assets/images/product/glutathione-gongskin.png'
+import imgMultiGummy      from '../assets/images/product/multi-gummy-centrum.jpeg'
+import imgVitaminC        from '../assets/images/product/vitaminc-goryeoeundan.jpeg'
+import imgHyaluronicAcid  from '../assets/images/product/hyaluronic-acid-nowfoods.jpeg'
+import imgInnerCollagen   from '../assets/images/product/inner-collagen-greenmonster.png'
+
 /* 신규 10개 */
 import imgMakeon          from '../assets/images/product/product-device-makeon.png'
 import imgSchoolofhip     from '../assets/images/product/product-tint-schoolofhip-inkmoodglow-034.jpg'
@@ -92,10 +101,20 @@ export const MIYU_PRODUCTS = [
   { id: 37, name: '퓌 쿠션 글래스 오리지널',                              price: '25,000', category: '쿠션',         img: imgFweeCushion, tags: [] },
   { id: 38, name: '퓌 틴트 스웨이드 5g',                                  price: '14,000', category: '틴트',         img: imgFweeSuede, tags: [] },
   { id: 39, name: '퓌 핑크 옵세션 스테이핏 틴트 로즈베이지',              price: '14,000', category: '틴트',         img: imgFweePink,  tags: [] },
+
+  /* ── 이너뷰티 ── */
+  { id: 40, name: '알티지 오메가3',                                        price: '29,000', category: '이너뷰티',     img: imgOmega3,         tags: [] },
+  { id: 41, name: '바이오 20억 생유산균',                                  price: '34,000', category: '이너뷰티',     img: imgProbiotics,     tags: [] },
+  { id: 42, name: '공스킨 글루타치온',                                     price: '38,000', category: '이너뷰티',     img: imgGlutathione,    tags: [] },
+  { id: 43, name: '센트룸 멀티 구미',                                      price: '22,000', category: '이너뷰티',     img: imgMultiGummy,     tags: [] },
+  { id: 44, name: '속편한 고려은단 비타민C',                               price: '18,000', category: '이너뷰티',     img: imgVitaminC,       tags: [] },
+  { id: 45, name: '나우푸드 히알루론산',                                   price: '26,000', category: '이너뷰티',     img: imgHyaluronicAcid, tags: [] },
+  { id: 46, name: '그린몬스터 이너뷰티 이너콜라겐',                         price: '31,000', category: '이너뷰티',     img: imgInnerCollagen,  tags: [] },
 ]
 
-/** GPT 시스템 프롬프트에 주입할 제품 목록 텍스트 */
+/** GPT 시스템 프롬프트에 주입할 제품 목록 텍스트 — 이미지 없는 제품은 절대 추천 불가 */
 export const PRODUCT_LIST_TEXT = MIYU_PRODUCTS
+  .filter(p => p.img !== null)
   .map(p => `${p.id}. ${p.name} / ${p.price}원 / ${p.category}`)
   .join('\n')
 

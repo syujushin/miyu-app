@@ -14,15 +14,16 @@ const SHOPPING_ITEMS = [
   '좋아요 상품 보기',
 ]
 const BEAUTY_ITEMS = [
-  { label: '마이 루틴',       to: '/mypage/my-beauty' },
-  { label: '나의 피부 데이터', to: '/mypage/skin-data' },
+  { label: '마이 루틴',       to: '/mypage/my-beauty', guideId: 'mypage-my-routine' },
+  { label: '나의 피부 데이터', to: '/mypage/skin-data', guideId: 'mypage-skin-data' },
   { label: '루틴 관리',       to: null },
 ]
 const CS_ITEMS     = ['FAQ', '1:1 문의', '앱 설정']
 
-function MenuItem({ label, to, navigate }) {
+function MenuItem({ label, to, navigate, guideId }) {
   return (
     <button
+      data-guide-id={guideId}
       onClick={() => to && navigate(to)}
       style={{
         width: '100%',
@@ -50,13 +51,13 @@ function Section({ title, items, navigate, noDivider }) {
   return (
     <>
       {!noDivider && <div style={{ height: 1, backgroundColor: '#F0EFF3', margin: '24px -20px' }} />}
-      <div style={{ paddingTop: noDivider ? 0 : 8, display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         <p style={{ fontSize: 15, fontWeight: 600, color: '#242227', margin: 0, lineHeight: 1.4 }}>
           {title}
         </p>
         {items.map(item => {
-          const { label, to } = normalize(item)
-          return <MenuItem key={label} label={label} to={to} navigate={navigate} />
+          const { label, to, guideId } = normalize(item)
+          return <MenuItem key={label} label={label} to={to} navigate={navigate} guideId={guideId} />
         })}
       </div>
     </>
@@ -66,23 +67,23 @@ function Section({ title, items, navigate, noDivider }) {
 export default function MyPage() {
   const navigate = useNavigate()
   return (
-    <div style={{ backgroundColor: '#FFFFFF', minHeight: '100%' }}>
+    <div style={{ backgroundColor: '#FFFFFF', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
 
-      {/* 상태바 */}
-      <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
-
-      {/* 헤더 */}
-      <div style={{ height: 58, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ fontSize: 18, fontWeight: 500, color: '#242227', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
-          마이페이지
-        </span>
+      {/* 고정 헤더 */}
+      <div style={{ position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#FFFFFF' }}>
+        <img src={statusBarSvg} alt="" draggable={false} style={{ width: '100%', display: 'block' }} />
+        <div style={{ height: 58, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: 18, fontWeight: 500, color: '#242227', lineHeight: 1.4, letterSpacing: '-0.01em' }}>
+            마이페이지
+          </span>
+        </div>
       </div>
 
       {/* 콘텐츠 */}
       <div style={{ padding: '0 20px 32px' }}>
 
         {/* 프로필 행 */}
-        <div className="stagger stagger-1" onClick={() => navigate('/mypage/profile')} style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, cursor: 'pointer' }}>
+        <div data-guide-id="mypage-profile" className="stagger stagger-1" onClick={() => navigate('/mypage/profile')} style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16, cursor: 'pointer' }}>
           {/* 프로필 이미지 */}
           <img src={profileSvg} alt="프로필" style={{ width: 68, height: 68, borderRadius: 99, display: 'block', flexShrink: 0 }} />
 

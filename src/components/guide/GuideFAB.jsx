@@ -3,7 +3,7 @@ import { useGuide } from '../../context/GuideContext'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 export default function GuideFAB({ bottom }) {
-  const { guideVisible, fabIntroVisible, startGuide } = useGuide()
+  const { guideVisible, fabIntroVisible, startGuide, miyubotGuideVisible, startMiyubotGuide, cameraOpen, mypageGuideVisible, startMypageGuide } = useGuide()
   const { pathname } = useLocation()
   const navigate = useNavigate()
 
@@ -11,11 +11,12 @@ export default function GuideFAB({ bottom }) {
   const isMiyubot = pathname === '/miyubot'
   const isMypage  = pathname === '/mypage' || pathname.startsWith('/mypage/')
 
-  if ((!isHome && !isMiyubot && !isMypage) || guideVisible) return null
+  if ((!isHome && !isMiyubot && !isMypage) || guideVisible || miyubotGuideVisible || mypageGuideVisible || cameraOpen) return null
 
   const handleClick = () => {
-    startGuide()
-    if (!isHome) navigate('/')
+    if (isMiyubot) startMiyubotGuide()
+    else if (isMypage) startMypageGuide()
+    else { startGuide(); if (!isHome) navigate('/') }
   }
 
   return (

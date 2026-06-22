@@ -3,8 +3,10 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import AppLayout      from './components/layout/AppLayout'
 import { GuideProvider } from './context/GuideContext'
-import GuideCard      from './components/guide/GuideCard'
-import GuideHighlight from './components/guide/GuideHighlight'
+import GuideCard         from './components/guide/GuideCard'
+import GuideHighlight    from './components/guide/GuideHighlight'
+import MiyubotGuideCard  from './components/guide/MiyubotGuideCard'
+import MypageGuideCard   from './components/guide/MypageGuideCard'
 import HomePage       from './pages/home/HomePage'
 import MyPage         from './pages/mypage/MyPage'
 import ProfilePage    from './pages/mypage/ProfilePage'
@@ -51,6 +53,8 @@ function AppContent() {
         </Routes>
       </AnimatePresence>
       <GuideCard />
+      <MiyubotGuideCard />
+      <MypageGuideCard />
       <GuideHighlight />
     </GuideProvider>
   )
