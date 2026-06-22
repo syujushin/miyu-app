@@ -122,7 +122,8 @@ export default function MiyubotGuideCard() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          style={{ position: 'absolute', inset: 0, zIndex: 9998, pointerEvents: 'all', touchAction: 'none' }}
+          onClick={skipMiyubot}
+          style={{ position: 'absolute', inset: 0, zIndex: 9998, pointerEvents: 'all', touchAction: 'none', cursor: 'default' }}
         >
           {/* SVG 스포트라이트 */}
           <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
@@ -148,6 +149,7 @@ export default function MiyubotGuideCard() {
           {hasAnchor && (
             <motion.div
               key={mbStep}
+              onClick={e => e.stopPropagation()}
               initial={{ opacity: 0, y: tooltipBelow ? 8 : -8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
