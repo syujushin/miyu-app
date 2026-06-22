@@ -4,11 +4,11 @@ import './index.css'
 import App from './App.jsx'
 
 function fitFrame() {
-  const frame = document.getElementById('phone-frame')
-  if (!frame) return
-  const scale = Math.min(window.innerWidth / 390, window.innerHeight / 844, 1)
-  frame.style.transform = scale < 1 ? `scale(${scale})` : ''
-  frame.style.transformOrigin = 'center center'
+  const wrapper = document.getElementById('mockup-wrapper')
+  if (!wrapper) return
+  const scale = Math.min(window.innerWidth / 420, window.innerHeight / 869, 1)
+  wrapper.style.transform = scale < 1 ? `scale(${scale})` : ''
+  wrapper.style.transformOrigin = 'center center'
   document.documentElement.style.setProperty('--frame-scale', String(scale))
 }
 fitFrame()

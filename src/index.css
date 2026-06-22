@@ -169,10 +169,6 @@ button {
   transition: transform 0.1s ease, opacity 0.1s ease;
   -webkit-tap-highlight-color: transparent;
 }
-button:active {
-  transform: scale(0.98);
-  opacity: 0.9;
-}
 
 .miyubot-input::placeholder {
   color: #9D9AA3;
@@ -200,7 +196,7 @@ body {
   overscroll-behavior: none;
   font-family: 'SUIT Variable', 'SUIT', sans-serif;
   font-weight: 400;
-  background-color: #DFDFDF;
+  background-color: #FFFFFF;
   color: #242227;
   letter-spacing: -0.01em;
   display: flex;
@@ -209,12 +205,32 @@ body {
   touch-action: manipulation;
 }
 
+#mockup-wrapper {
+  position: relative;
+  width: 420px;
+  height: 869px;
+  flex-shrink: 0;
+}
+
+#phone-mockup {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 869px;
+  pointer-events: none;
+  z-index: 9999;
+  display: block;
+}
+
 #phone-frame {
+  position: absolute;
+  top: 12px;
+  left: 15px;
   width: 390px;
   height: 844px;
-  flex-shrink: 0;
   overflow: hidden;
-  position: relative;
+  border-radius: 40px;
 }
 
 #root {

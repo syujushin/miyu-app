@@ -236,14 +236,44 @@ export default function ProductDetailPage() {
             </span>
           </div>
           {/* 리뷰 행 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 6 }}>
             <StarRow rating={4.5} size={14} fillColor="#C0A3F7" emptyColor="#F0EFF3" gap={-2} />
             <span style={{ fontSize: 14, fontWeight: 600, color: '#C0A3F7', lineHeight: 1.7 }}>4.5</span>
             <motion.div
               onClick={() => navigate('/product-review/vinote')}
-              whileTap={{ scale: 0.97 }}
               style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 'auto', cursor: 'pointer' }}
             >
+              {/* 플로팅 말풍선 */}
+              <motion.div
+                animate={{ y: [0, -4, 0] }}
+                transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  position: 'absolute',
+                  top: -32,
+                  right: 0,
+                  backgroundColor: '#ECE0FE',
+                  borderRadius: 8,
+                  padding: '6px 10px 7px',
+                  pointerEvents: 'none',
+                  zIndex: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 500, color: '#242227', lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                  내 피부 맞춤 리뷰 보기
+                </span>
+                <div style={{
+                  position: 'absolute',
+                  bottom: -6,
+                  right: 14,
+                  width: 0, height: 0,
+                  borderLeft: '6px solid transparent',
+                  borderRight: '6px solid transparent',
+                  borderTop: '6px solid #ECE0FE',
+                }} />
+              </motion.div>
+
               <span style={{ fontSize: 12, fontWeight: 400, color: '#9D9AA3', lineHeight: 1.5 }}>4,351개의 리뷰</span>
               <img src={chevronRight} alt="" style={{ width: 14, height: 14, display: 'block' }} />
             </motion.div>

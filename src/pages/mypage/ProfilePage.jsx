@@ -154,7 +154,7 @@ export default function ProfilePage() {
         </motion.div>
 
         {/* 내가 받은 리뷰 평가 */}
-        <motion.div variants={fadeUp} style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: 20 }}>
+        <motion.div variants={fadeUp} style={{ backgroundColor: '#FFFFFF', borderRadius: 16, padding: '20px 20px 0' }}>
           {/* 헤더 */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ fontSize: 15, fontWeight: 600, color: '#242227', letterSpacing: '-0.01em' }}>내가 받은 리뷰 평가</span>

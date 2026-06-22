@@ -216,7 +216,7 @@ export default function ProductReviewPage() {
           <p style={{ fontSize: 18, fontWeight: 500, color: '#242227', margin: 0, lineHeight: 1.4 }}>제품 리뷰</p>
         </div>
         {/* Row 2: 내 피부 맞춤 + 토글 (좌) / 필터 (우) */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 20, paddingRight: 20, paddingBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', paddingLeft: 20, paddingRight: 20, paddingBottom: 10, gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span style={{ fontSize: 16, fontWeight: 400, color: '#242227', lineHeight: 1.4 }}>내 피부 맞춤</span>
             <button
@@ -233,7 +233,39 @@ export default function ProductReviewPage() {
               )}
             </button>
           </div>
-          <button onClick={() => setShowFilter(true)} style={{ padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexShrink: 0 }}>
+
+          {/* 말풍선 */}
+          {false && <motion.div
+                animate={{ x: [-2, 2] }}
+                transition={{ duration: 1.8, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' }}
+                style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  left: -4,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 0, height: 0,
+                  borderTop: '4px solid transparent',
+                  borderBottom: '4px solid transparent',
+                  borderRight: '4px solid #ECE0FE',
+                }} />
+                <div style={{
+                  backgroundColor: '#ECE0FE',
+                  borderRadius: 6,
+                  padding: '6px 10px 7px',
+                  pointerEvents: 'none',
+                  zIndex: 10,
+                  display: 'flex',
+                  alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: 12, fontWeight: 500, color: '#242227', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+                    유사 피부 리뷰만 보여요
+                  </span>
+                </div>
+          </motion.div>}
+
+          <button onClick={() => setShowFilter(true)} style={{ marginLeft: 'auto', padding: 0, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexShrink: 0 }}>
             <img src={filterSvg} alt="" style={{ width: 36, height: 36, display: 'block' }} />
           </button>
         </div>
